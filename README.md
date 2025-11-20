@@ -3,27 +3,31 @@ Hackathon Repo for Team Auto coder
 
 ![White Board](https://github.com/user-attachments/assets/6f20f368-36ee-48e2-aa6a-7e0d58a7b8c0)
 
-## Quick start
+Very Personalised Much Real Time Super Dynamic Ad
+--- Pretend you own a chocolate brand and you want to advertise on our website, but has no resourec to create ads? 
+--- Pretend you're a customer browsing around the website and getting an AD that is very relevant you ended up putting that item to the basket
+--- Pretend you're a media agency and you have a new "product" to sell to agencies / brands 
 
-```bash
-npm install
-npm run dev
-```
 
-## What was added
+Why do we want this? 
+For Customers: A new ad placement that will be extermely personalised AND additive to the customers' experience 
 
-- Vite + React front-end with routes for login, product list, and product detail.
-- Interaction tracking context that logs searches, product views, and add-to-basket clicks, then posts them to an API stub (`src/context/InteractionContext.jsx`, `src/services/api.js`).
-- Dynamic ad panel that refreshes creative based on the latest interaction (`src/hooks/useAdEngine.js`, `src/components/AdPanel.jsx`).
-- Mock product catalogue and search with instant filtering (`src/data/products.js`, `src/pages/ProductListPage.jsx`).
-- Minimal styling and favicon to visualize the flows (`src/styles.css`).
-- When not signed in, the ad panel pulls a random creative from a mock API and swaps once interactions begin (`src/services/api.js`, `src/components/AdPanel.jsx`).
-- Utility script to enrich the provided CSV with category/name-based image URLs (`scripts/fillImages.js` → writes `DIM_item_202511201338_with_images.csv`).
-- Basket and checkout flow: add/update items, basket totals, and a simple checkout form with confirmation (`src/context/BasketContext.jsx`, `src/pages/BasketPage.jsx`, `src/pages/CheckoutPage.jsx`).
+For Media Agency: A new media and service to sell, revenue making
 
-## Structure
+For Suppliers/Agencies/Brands: A new way to dynamically create ads without the need of creating creatives. 
 
-- `src/pages/HomePage.jsx` – landing with random product picks and CTA to login.
-- `src/pages/LoginPage.jsx` – Sainsbury's-inspired login (username/password) sending username to BE and fetching previous interactions.
-- `src/pages/ProductListPage.jsx` – search bar, product cards, ads, interaction feed.
-- `src/pages/ProductDetailPage.jsx` – product detail with interaction tracking for views/add-to-basket.
+Strech goasls 
+
+Gamification to ads ---> make ads more interactive
+- Instead of an image / video, ads could be simple mini games:
+-- Throw item (exact sku image) to a basket / trolley
+--- Users can have 2 consecutive actions: direction then power
+  --- if they manage to get the item to the basket / trolley
+  ----- the item actually gets added to the basket + a special discount / points added 
+
+Supplier config,
+- A page (a new channel within Pollen techincally) on settings for these ads
+- - think targetted skus
+  - think 
+
+
