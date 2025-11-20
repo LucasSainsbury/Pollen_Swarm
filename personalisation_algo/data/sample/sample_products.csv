@@ -1,0 +1,16 @@
+product_id,product_name,product_category,is_discounted,in_stock,price
+P001,Organic Whole Milk 1L,dairy,False,True,3.99
+P002,Whole Wheat Bread,bakery,False,True,2.49
+P003,Free Range Eggs 12pk,dairy,False,True,5.99
+P004,Greek Yogurt 500g,dairy,False,True,4.49
+P005,Cheddar Cheese 200g,dairy,True,True,3.99
+P006,Fresh Bananas 1kg,produce,False,True,2.99
+P007,Organic Apples 1kg,produce,False,True,4.99
+P008,Baby Spinach 200g,produce,False,False,3.49
+P009,Ground Coffee 250g,beverages,False,True,8.99
+P010,Green Tea 25pk,beverages,False,True,4.99
+P011,Orange Juice 1L,beverages,True,True,3.49
+P012,Almond Butter 350g,pantry,False,True,9.99
+P013,Brown Rice 2kg,pantry,False,True,6.99
+P014,Olive Oil 500ml,pantry,False,True,12.99
+P015,Tomato Pasta Sauce,pantry,False,True,3.99

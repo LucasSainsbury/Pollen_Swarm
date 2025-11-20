@@ -1,0 +1,501 @@
+product_id,product_name,product_category,is_discounted,in_stock,price
+P001,Frozen Spinach 400g,frozen,FALSE,TRUE,9.21
+P002,Cheddar Cheese 200g,dairy,FALSE,TRUE,3.85
+P003,Cucumbers 2pcs,produce,TRUE,TRUE,35.1
+P004,Gummy Bears 100g,snacks,TRUE,TRUE,38.22
+P005,Chicken Breast 500g,meat,FALSE,TRUE,25.23
+P006,Frozen Peas 450g,frozen,FALSE,TRUE,42.89
+P007,Coffee Beans 250g,beverages,TRUE,TRUE,49.05
+P008,Iced Tea 1L,beverages,FALSE,TRUE,39.52
+P009,Milk 1L,dairy,FALSE,TRUE,17.13
+P010,Rye Bread 400g,bakery,FALSE,TRUE,21.8
+P011,Tomatoes 500g,produce,TRUE,TRUE,33.88
+P012,Vanilla Ice Cream 500ml,frozen,TRUE,TRUE,30.34
+P013,Frozen Lasagna 500g,frozen,TRUE,TRUE,40.47
+P014,Trail Mix 150g,snacks,TRUE,TRUE,47.62
+P015,Bagel 4pcs,bakery,TRUE,TRUE,41.88
+P016,Butter 250g,dairy,TRUE,TRUE,40.06
+P017,Greek Yogurt 500g,dairy,TRUE,TRUE,43.66
+P018,Beef Steak 300g,meat,TRUE,TRUE,26.69
+P019,Apples 1kg,produce,FALSE,TRUE,21.53
+P020,Green Tea 20 bags,beverages,TRUE,TRUE,21.84
+P021,Orange Juice 1L,beverages,FALSE,TRUE,35.24
+P022,Brioche Bun 6pcs,bakery,TRUE,TRUE,13.72
+P023,Rice Cakes 130g,snacks,FALSE,TRUE,8.55
+P024,Frozen Chicken Nuggets 300g,frozen,TRUE,TRUE,30.21
+P025,Blueberries 125g,produce,FALSE,TRUE,34.65
+P026,Bananas 1kg,produce,FALSE,TRUE,16.95
+P027,Ground Beef 500g,meat,TRUE,TRUE,8.71
+P028,Sliced White Bread 600g,bakery,FALSE,TRUE,48.76
+P029,Frozen Berries 300g,frozen,FALSE,TRUE,5.49
+P030,Sour Cream 200g,dairy,TRUE,TRUE,19.41
+P031,Potatoes 2kg,produce,TRUE,TRUE,8.73
+P032,Fish Fingers 300g,frozen,FALSE,TRUE,10.87
+P033,Ciabatta 2pcs,bakery,TRUE,TRUE,39.67
+P034,Sliced Bacon 250g,meat,TRUE,TRUE,35.92
+P035,Croissant 2pcs,bakery,TRUE,TRUE,36.64
+P036,Turkey Breast 300g,meat,TRUE,TRUE,34.67
+P037,Pita Bread 5pcs,bakery,FALSE,TRUE,29.33
+P038,Oat Milk 1L,dairy,TRUE,TRUE,4.25
+P039,Black Tea 20 bags,beverages,TRUE,TRUE,1.5
+P040,Sourdough Bread 400g,bakery,TRUE,TRUE,42.79
+P041,Lettuce 1pc,produce,TRUE,TRUE,40.09
+P042,Whole Wheat Bread 500g,bakery,TRUE,TRUE,49.21
+P043,Ham Slices 200g,meat,FALSE,TRUE,13.01
+P044,Multigrain Bread 500g,bakery,TRUE,TRUE,30.93
+P045,Sausages 6pcs,meat,TRUE,TRUE,26.57
+P046,Pita Bread 5pcs,bakery,TRUE,TRUE,36.12
+P047,Apple Juice 1L,beverages,TRUE,TRUE,9.96
+P048,Bagel 4pcs,bakery,FALSE,TRUE,29.56
+P049,Cola 1.5L,beverages,FALSE,TRUE,16.13
+P050,Biscuits 200g,snacks,FALSE,TRUE,15.73
+P051,Pretzels 250g,snacks,TRUE,TRUE,4.82
+P052,Sparkling Water 1L,beverages,TRUE,TRUE,12.86
+P053,Lemonade 1L,beverages,FALSE,TRUE,1.46
+P054,Sourdough Bread 400g,bakery,FALSE,TRUE,1.54
+P055,Mineral Water 1.5L,beverages,FALSE,TRUE,48.2
+P056,Frozen French Fries 1kg,frozen,TRUE,TRUE,26.5
+P057,Cottage Cheese 300g,dairy,FALSE,TRUE,7.99
+P058,Frozen Pizza 400g,frozen,TRUE,TRUE,23.14
+P059,Chocolate Bar 100g,snacks,TRUE,TRUE,36.37
+P060,Spinach 250g,produce,TRUE,TRUE,43.51
+P061,Cream Cheese 150g,dairy,TRUE,TRUE,47.83
+P062,Carrots 1kg,produce,FALSE,TRUE,22.76
+P063,Potato Chips 150g,snacks,TRUE,TRUE,44.57
+P064,Mineral Water 1.5L,beverages,FALSE,TRUE,24.21
+P065,Frozen Mixed Veg 500g,frozen,FALSE,TRUE,42.97
+P066,Fish Fingers 300g,frozen,FALSE,TRUE,8.44
+P067,Salted Peanuts 200g,snacks,TRUE,TRUE,29.47
+P068,Sparkling Water 1L,beverages,TRUE,TRUE,48.27
+P069,Lamb Chops 400g,meat,FALSE,TRUE,7.59
+P070,Vanilla Ice Cream 500ml,frozen,FALSE,TRUE,21.34
+P071,Frozen Peas 450g,frozen,FALSE,TRUE,15.17
+P072,Strawberries 250g,produce,FALSE,TRUE,33.73
+P073,Frozen Spinach 400g,frozen,TRUE,TRUE,32.34
+P074,Pork Chops 400g,meat,FALSE,TRUE,29.53
+P075,Brioche Bun 6pcs,bakery,TRUE,TRUE,25.95
+P076,Whole Wheat Bread 500g,bakery,FALSE,TRUE,41.49
+P077,Frozen French Fries 1kg,frozen,FALSE,TRUE,33.37
+P078,Granola Bar 3pcs,snacks,FALSE,TRUE,8.93
+P079,Mozzarella 200g,dairy,TRUE,TRUE,33.19
+P080,Multigrain Bread 500g,bakery,FALSE,TRUE,15.64
+P081,Goat Cheese 100g,dairy,FALSE,TRUE,4.3
+P082,Apples 1kg,produce,TRUE,TRUE,1.4
+P083,Spinach 250g,produce,FALSE,TRUE,28.25
+P084,Brioche Bun 6pcs,bakery,TRUE,TRUE,6.62
+P085,Butter 250g,dairy,FALSE,TRUE,18.59
+P086,Coffee Beans 250g,beverages,TRUE,TRUE,3.04
+P087,Apples 1kg,produce,FALSE,TRUE,33.04
+P088,Chicken Thighs 600g,meat,TRUE,TRUE,39.49
+P089,Sourdough Bread 400g,bakery,FALSE,TRUE,34.77
+P090,Sliced Bacon 250g,meat,FALSE,TRUE,18.37
+P091,Sausages 6pcs,meat,TRUE,TRUE,4.25
+P092,Potatoes 2kg,produce,TRUE,TRUE,30.27
+P093,Bagel 4pcs,bakery,TRUE,TRUE,20.51
+P094,Popcorn 100g,snacks,TRUE,TRUE,46.21
+P095,Iced Tea 1L,beverages,FALSE,TRUE,33.32
+P096,Frozen Pizza 400g,frozen,TRUE,TRUE,24.61
+P097,Goat Cheese 100g,dairy,TRUE,TRUE,19.58
+P098,Salted Peanuts 200g,snacks,FALSE,TRUE,6.76
+P099,Frozen Spinach 400g,frozen,FALSE,TRUE,27.51
+P100,Tomatoes 500g,produce,FALSE,TRUE,40.51
+P101,Frozen Berries 300g,frozen,FALSE,TRUE,5.94
+P102,Multigrain Bread 500g,bakery,FALSE,TRUE,5.33
+P103,Ham Slices 200g,meat,TRUE,TRUE,19.85
+P104,Butter 250g,dairy,FALSE,TRUE,35.73
+P105,Sour Cream 200g,dairy,FALSE,TRUE,11.99
+P106,Butter 250g,dairy,TRUE,TRUE,6.96
+P107,Popcorn 100g,snacks,TRUE,TRUE,8.89
+P108,Chicken Thighs 600g,meat,TRUE,TRUE,21.06
+P109,Multigrain Bread 500g,bakery,TRUE,TRUE,24.88
+P110,Greek Yogurt 500g,dairy,TRUE,TRUE,48.03
+P111,Sliced Bacon 250g,meat,TRUE,TRUE,24.05
+P112,Croissant 2pcs,bakery,FALSE,TRUE,46.95
+P113,Sour Cream 200g,dairy,TRUE,TRUE,6.1
+P114,Lamb Chops 400g,meat,TRUE,TRUE,22.42
+P115,Pretzels 250g,snacks,TRUE,TRUE,15.31
+P116,Apples 1kg,produce,TRUE,TRUE,26.43
+P117,Sliced Bacon 250g,meat,FALSE,TRUE,8.51
+P118,Frozen Pizza 400g,frozen,FALSE,TRUE,19.85
+P119,Frozen Pizza 400g,frozen,TRUE,TRUE,32.81
+P120,Frozen Berries 300g,frozen,TRUE,TRUE,19.68
+P121,Potatoes 2kg,produce,FALSE,TRUE,48.33
+P122,Milk 1L,dairy,FALSE,TRUE,16.05
+P123,Greek Yogurt 500g,dairy,TRUE,TRUE,3.66
+P124,Butter 250g,dairy,FALSE,TRUE,23.59
+P125,Frozen Chicken Nuggets 300g,frozen,TRUE,TRUE,5.92
+P126,Salted Peanuts 200g,snacks,FALSE,TRUE,29.26
+P127,Sparkling Water 1L,beverages,FALSE,TRUE,12.52
+P128,Potato Chips 150g,snacks,FALSE,TRUE,42.36
+P129,Cottage Cheese 300g,dairy,TRUE,TRUE,27.52
+P130,Iced Tea 1L,beverages,FALSE,TRUE,48.01
+P131,Sausages 6pcs,meat,TRUE,TRUE,20.97
+P132,Frozen Peas 450g,frozen,TRUE,TRUE,27.7
+P133,Vanilla Ice Cream 500ml,frozen,FALSE,TRUE,33.5
+P134,Pita Bread 5pcs,bakery,FALSE,TRUE,5.75
+P135,Spinach 250g,produce,FALSE,TRUE,18.8
+P136,Lettuce 1pc,produce,TRUE,TRUE,15.48
+P137,Apple Juice 1L,beverages,TRUE,TRUE,5.55
+P138,Bananas 1kg,produce,TRUE,TRUE,48.33
+P139,Cream Cheese 150g,dairy,FALSE,TRUE,48.11
+P140,Fish Fingers 300g,frozen,FALSE,TRUE,39.94
+P141,Coffee Beans 250g,beverages,TRUE,TRUE,1.28
+P142,Rice Cakes 130g,snacks,TRUE,TRUE,5.98
+P143,Croissant 2pcs,bakery,TRUE,TRUE,37.62
+P144,Iced Tea 1L,beverages,TRUE,TRUE,48.98
+P145,Vanilla Ice Cream 500ml,frozen,FALSE,TRUE,8.55
+P146,Lemonade 1L,beverages,FALSE,TRUE,21.63
+P147,Mineral Water 1.5L,beverages,FALSE,TRUE,10.01
+P148,Tomatoes 500g,produce,FALSE,TRUE,23.89
+P149,Lettuce 1pc,produce,FALSE,TRUE,7.15
+P150,Carrots 1kg,produce,FALSE,TRUE,22.76
+P151,Goat Cheese 100g,dairy,FALSE,TRUE,44.75
+P152,Frozen Peas 450g,frozen,FALSE,TRUE,10.01
+P153,Sour Cream 200g,dairy,TRUE,TRUE,25.4
+P154,Frozen Chicken Nuggets 300g,frozen,FALSE,TRUE,34.81
+P155,Strawberries 250g,produce,TRUE,TRUE,35.14
+P156,Sausages 6pcs,meat,FALSE,TRUE,28.74
+P157,Lemonade 1L,beverages,TRUE,TRUE,36.43
+P158,Chicken Thighs 600g,meat,FALSE,TRUE,27.07
+P159,Black Tea 20 bags,beverages,TRUE,TRUE,35.23
+P160,Brioche Bun 6pcs,bakery,FALSE,TRUE,36.66
+P161,Orange Juice 1L,beverages,TRUE,TRUE,4.85
+P162,Cola 1.5L,beverages,TRUE,TRUE,44.1
+P163,Frozen Lasagna 500g,frozen,FALSE,TRUE,37.99
+P164,Frozen Pizza 400g,frozen,FALSE,TRUE,14.03
+P165,Trail Mix 150g,snacks,FALSE,TRUE,7.75
+P166,Granola Bar 3pcs,snacks,FALSE,TRUE,13.87
+P167,Ciabatta 2pcs,bakery,TRUE,TRUE,38.33
+P168,Whole Wheat Bread 500g,bakery,TRUE,TRUE,2.43
+P169,Chicken Breast 500g,meat,FALSE,TRUE,4.08
+P170,Ham Slices 200g,meat,TRUE,TRUE,20.7
+P171,Beef Steak 300g,meat,FALSE,TRUE,33.03
+P172,Pork Chops 400g,meat,TRUE,TRUE,45.98
+P173,Croissant 2pcs,bakery,FALSE,TRUE,23.76
+P174,Chocolate Bar 100g,snacks,TRUE,TRUE,7.88
+P175,Pita Bread 5pcs,bakery,FALSE,TRUE,48.75
+P176,Whole Wheat Bread 500g,bakery,TRUE,TRUE,28.33
+P177,Milk 1L,dairy,FALSE,TRUE,2.3
+P178,Cucumbers 2pcs,produce,TRUE,TRUE,39.56
+P179,Lemonade 1L,beverages,FALSE,TRUE,22.35
+P180,Beef Steak 300g,meat,TRUE,TRUE,34.75
+P181,Bananas 1kg,produce,TRUE,TRUE,33.57
+P182,Frozen Pizza 400g,frozen,FALSE,TRUE,23.63
+P183,Mozzarella 200g,dairy,TRUE,TRUE,13.8
+P184,Tomatoes 500g,produce,FALSE,TRUE,17.81
+P185,Lemonade 1L,beverages,TRUE,TRUE,24.83
+P186,Pork Chops 400g,meat,TRUE,TRUE,16.48
+P187,Sliced Bacon 250g,meat,TRUE,TRUE,1.65
+P188,Sausages 6pcs,meat,FALSE,TRUE,39.6
+P189,Sour Cream 200g,dairy,TRUE,TRUE,45.68
+P190,Sparkling Water 1L,beverages,TRUE,TRUE,34.91
+P191,Salted Peanuts 200g,snacks,FALSE,TRUE,44.44
+P192,Pretzels 250g,snacks,FALSE,TRUE,11.31
+P193,Trail Mix 150g,snacks,FALSE,TRUE,27.59
+P194,Lamb Chops 400g,meat,TRUE,TRUE,8.38
+P195,Beef Steak 300g,meat,FALSE,TRUE,11.91
+P196,Chicken Breast 500g,meat,FALSE,TRUE,34.91
+P197,Pita Bread 5pcs,bakery,TRUE,TRUE,8.36
+P198,Lettuce 1pc,produce,TRUE,TRUE,27.33
+P199,Rice Cakes 130g,snacks,TRUE,TRUE,26.58
+P200,Bagel 4pcs,bakery,FALSE,TRUE,27.65
+P201,Trail Mix 150g,snacks,FALSE,TRUE,21.14
+P202,Chocolate Bar 100g,snacks,TRUE,TRUE,37.41
+P203,Ground Beef 500g,meat,TRUE,TRUE,46.73
+P204,Turkey Breast 300g,meat,TRUE,TRUE,13.93
+P205,Sparkling Water 1L,beverages,FALSE,TRUE,10.95
+P206,Mineral Water 1.5L,beverages,TRUE,TRUE,14.93
+P207,Apple Juice 1L,beverages,FALSE,TRUE,7.85
+P208,Popcorn 100g,snacks,FALSE,TRUE,10.55
+P209,Bananas 1kg,produce,TRUE,TRUE,47.11
+P210,Oat Milk 1L,dairy,FALSE,TRUE,8.08
+P211,Cottage Cheese 300g,dairy,FALSE,TRUE,38.97
+P212,Frozen Peas 450g,frozen,FALSE,TRUE,41.59
+P213,Orange Juice 1L,beverages,FALSE,TRUE,48.67
+P214,Cream Cheese 150g,dairy,FALSE,TRUE,19.85
+P215,Chicken Thighs 600g,meat,TRUE,TRUE,30.94
+P216,Frozen Lasagna 500g,frozen,FALSE,TRUE,45.14
+P217,Biscuits 200g,snacks,TRUE,TRUE,22.88
+P218,Beef Steak 300g,meat,TRUE,TRUE,44.49
+P219,Oat Milk 1L,dairy,FALSE,TRUE,43.53
+P220,Green Tea 20 bags,beverages,FALSE,TRUE,30.72
+P221,Lamb Chops 400g,meat,TRUE,TRUE,41.81
+P222,Whole Wheat Bread 500g,bakery,FALSE,TRUE,32.37
+P223,Orange Juice 1L,beverages,TRUE,TRUE,19.29
+P224,Potatoes 2kg,produce,TRUE,TRUE,46.13
+P225,Biscuits 200g,snacks,TRUE,TRUE,5.01
+P226,Gummy Bears 100g,snacks,FALSE,TRUE,38.72
+P227,Frozen Chicken Nuggets 300g,frozen,TRUE,TRUE,40.34
+P228,Potato Chips 150g,snacks,TRUE,TRUE,26.56
+P229,Oat Milk 1L,dairy,FALSE,TRUE,16.34
+P230,Whole Wheat Bread 500g,bakery,TRUE,TRUE,28.44
+P231,Chicken Breast 500g,meat,TRUE,TRUE,36.97
+P232,Sour Cream 200g,dairy,TRUE,TRUE,6.01
+P233,Rice Cakes 130g,snacks,FALSE,TRUE,36.39
+P234,Orange Juice 1L,beverages,FALSE,TRUE,28.82
+P235,Frozen French Fries 1kg,frozen,TRUE,TRUE,37.2
+P236,Frozen Peas 450g,frozen,TRUE,TRUE,27.04
+P237,Green Tea 20 bags,beverages,TRUE,TRUE,8.6
+P238,Ham Slices 200g,meat,FALSE,TRUE,11.64
+P239,Sliced Bacon 250g,meat,FALSE,TRUE,5.78
+P240,Chicken Breast 500g,meat,FALSE,TRUE,1.94
+P241,Sausages 6pcs,meat,TRUE,TRUE,44.8
+P242,Potato Chips 150g,snacks,TRUE,TRUE,2.06
+P243,Spinach 250g,produce,FALSE,TRUE,22.12
+P244,Frozen Spinach 400g,frozen,TRUE,TRUE,42.27
+P245,Bananas 1kg,produce,FALSE,TRUE,5.38
+P246,Brioche Bun 6pcs,bakery,FALSE,TRUE,5.92
+P247,Whole Wheat Bread 500g,bakery,TRUE,TRUE,48.17
+P248,Sparkling Water 1L,beverages,TRUE,TRUE,18.1
+P249,Sourdough Bread 400g,bakery,TRUE,TRUE,20.18
+P250,Pretzels 250g,snacks,TRUE,TRUE,2.11
+P251,Pretzels 250g,snacks,TRUE,TRUE,2.36
+P252,Potato Chips 150g,snacks,TRUE,TRUE,34.65
+P253,Sliced Bacon 250g,meat,FALSE,TRUE,21.38
+P254,Sparkling Water 1L,beverages,TRUE,TRUE,12.61
+P255,Frozen Lasagna 500g,frozen,TRUE,TRUE,49.9
+P256,Cola 1.5L,beverages,FALSE,TRUE,26.0
+P257,Rye Bread 400g,bakery,TRUE,TRUE,42.52
+P258,Orange Juice 1L,beverages,FALSE,TRUE,25.02
+P259,Chicken Thighs 600g,meat,TRUE,TRUE,16.3
+P260,Apples 1kg,produce,FALSE,TRUE,24.37
+P261,Brioche Bun 6pcs,bakery,TRUE,TRUE,21.91
+P262,Spinach 250g,produce,FALSE,TRUE,12.64
+P263,Vanilla Ice Cream 500ml,frozen,TRUE,TRUE,15.17
+P264,Blueberries 125g,produce,TRUE,TRUE,29.54
+P265,Apple Juice 1L,beverages,FALSE,TRUE,40.81
+P266,Granola Bar 3pcs,snacks,FALSE,TRUE,17.88
+P267,Ham Slices 200g,meat,FALSE,TRUE,22.3
+P268,Lemonade 1L,beverages,FALSE,TRUE,41.38
+P269,Iced Tea 1L,beverages,TRUE,TRUE,48.53
+P270,Sparkling Water 1L,beverages,TRUE,TRUE,32.2
+P271,Spinach 250g,produce,TRUE,TRUE,22.95
+P272,Cola 1.5L,beverages,TRUE,TRUE,7.45
+P273,Popcorn 100g,snacks,FALSE,TRUE,48.84
+P274,Croissant 2pcs,bakery,FALSE,TRUE,10.26
+P275,Coffee Beans 250g,beverages,TRUE,TRUE,14.78
+P276,Granola Bar 3pcs,snacks,TRUE,TRUE,28.78
+P277,Blueberries 125g,produce,FALSE,TRUE,42.42
+P278,Orange Juice 1L,beverages,FALSE,TRUE,44.18
+P279,Bagel 4pcs,bakery,TRUE,TRUE,20.61
+P280,Lemonade 1L,beverages,TRUE,TRUE,44.3
+P281,Potatoes 2kg,produce,FALSE,TRUE,38.23
+P282,Orange Juice 1L,beverages,FALSE,TRUE,39.24
+P283,Chicken Breast 500g,meat,FALSE,TRUE,44.54
+P284,Ground Beef 500g,meat,FALSE,TRUE,32.68
+P285,Pork Chops 400g,meat,TRUE,TRUE,38.84
+P286,Black Tea 20 bags,beverages,FALSE,TRUE,8.76
+P287,Frozen Lasagna 500g,frozen,TRUE,TRUE,32.79
+P288,Cucumbers 2pcs,produce,FALSE,TRUE,39.5
+P289,Lemonade 1L,beverages,FALSE,TRUE,47.9
+P290,Pita Bread 5pcs,bakery,TRUE,TRUE,32.36
+P291,Rye Bread 400g,bakery,TRUE,TRUE,21.83
+P292,Frozen Berries 300g,frozen,FALSE,TRUE,15.87
+P293,Rice Cakes 130g,snacks,FALSE,TRUE,44.13
+P294,Bagel 4pcs,bakery,TRUE,TRUE,4.58
+P295,Butter 250g,dairy,TRUE,TRUE,34.31
+P296,Mineral Water 1.5L,beverages,FALSE,TRUE,36.63
+P297,Biscuits 200g,snacks,TRUE,TRUE,9.67
+P298,Cheddar Cheese 200g,dairy,FALSE,TRUE,7.49
+P299,Trail Mix 150g,snacks,FALSE,TRUE,25.48
+P300,Sausages 6pcs,meat,TRUE,TRUE,9.41
+P301,Green Tea 20 bags,beverages,TRUE,TRUE,2.99
+P302,Cottage Cheese 300g,dairy,FALSE,TRUE,29.87
+P303,Green Tea 20 bags,beverages,FALSE,TRUE,14.95
+P304,Carrots 1kg,produce,FALSE,TRUE,5.59
+P305,Frozen Lasagna 500g,frozen,FALSE,TRUE,44.31
+P306,Frozen Chicken Nuggets 300g,frozen,TRUE,TRUE,46.07
+P307,Chicken Thighs 600g,meat,FALSE,TRUE,8.75
+P308,Tomatoes 500g,produce,FALSE,TRUE,39.72
+P309,Frozen Mixed Veg 500g,frozen,TRUE,TRUE,5.96
+P310,Sour Cream 200g,dairy,TRUE,TRUE,6.71
+P311,Granola Bar 3pcs,snacks,TRUE,TRUE,31.35
+P312,Gummy Bears 100g,snacks,FALSE,TRUE,11.69
+P313,Bananas 1kg,produce,FALSE,TRUE,23.49
+P314,Lamb Chops 400g,meat,TRUE,TRUE,47.68
+P315,Mineral Water 1.5L,beverages,TRUE,TRUE,26.46
+P316,Frozen Peas 450g,frozen,FALSE,TRUE,27.48
+P317,Chicken Thighs 600g,meat,FALSE,TRUE,15.21
+P318,Greek Yogurt 500g,dairy,FALSE,TRUE,33.5
+P319,Sliced Bacon 250g,meat,TRUE,TRUE,42.88
+P320,Orange Juice 1L,beverages,TRUE,TRUE,2.45
+P321,Sparkling Water 1L,beverages,FALSE,TRUE,33.11
+P322,Ground Beef 500g,meat,FALSE,TRUE,45.74
+P323,Sliced Bacon 250g,meat,FALSE,TRUE,36.62
+P324,Chicken Thighs 600g,meat,TRUE,TRUE,37.28
+P325,Vanilla Ice Cream 500ml,frozen,FALSE,TRUE,40.32
+P326,Bananas 1kg,produce,TRUE,TRUE,19.06
+P327,Frozen Lasagna 500g,frozen,FALSE,TRUE,11.34
+P328,Sour Cream 200g,dairy,TRUE,TRUE,9.56
+P329,Sour Cream 200g,dairy,TRUE,TRUE,35.07
+P330,Ciabatta 2pcs,bakery,FALSE,TRUE,30.77
+P331,Chicken Breast 500g,meat,FALSE,TRUE,48.69
+P332,Granola Bar 3pcs,snacks,TRUE,TRUE,32.57
+P333,Frozen Berries 300g,frozen,FALSE,TRUE,31.82
+P334,Sourdough Bread 400g,bakery,TRUE,TRUE,36.15
+P335,Cucumbers 2pcs,produce,FALSE,TRUE,25.41
+P336,Chicken Thighs 600g,meat,TRUE,TRUE,43.88
+P337,Sour Cream 200g,dairy,TRUE,TRUE,14.28
+P338,Whole Wheat Bread 500g,bakery,TRUE,TRUE,34.57
+P339,Lettuce 1pc,produce,TRUE,TRUE,28.08
+P340,Multigrain Bread 500g,bakery,TRUE,TRUE,14.58
+P341,Pork Chops 400g,meat,TRUE,TRUE,43.11
+P342,Croissant 2pcs,bakery,FALSE,TRUE,18.58
+P343,Bagel 4pcs,bakery,FALSE,TRUE,26.84
+P344,Coffee Beans 250g,beverages,TRUE,TRUE,19.06
+P345,Frozen Lasagna 500g,frozen,TRUE,TRUE,38.53
+P346,Carrots 1kg,produce,TRUE,TRUE,12.44
+P347,Bananas 1kg,produce,FALSE,TRUE,36.43
+P348,Croissant 2pcs,bakery,TRUE,TRUE,38.7
+P349,Pork Chops 400g,meat,FALSE,TRUE,22.65
+P350,Pork Chops 400g,meat,TRUE,TRUE,48.58
+P351,Granola Bar 3pcs,snacks,TRUE,TRUE,17.41
+P352,Ham Slices 200g,meat,TRUE,TRUE,46.45
+P353,Carrots 1kg,produce,FALSE,TRUE,2.04
+P354,Sourdough Bread 400g,bakery,FALSE,TRUE,46.38
+P355,Ground Beef 500g,meat,TRUE,TRUE,27.49
+P356,Gummy Bears 100g,snacks,FALSE,TRUE,46.29
+P357,Cheddar Cheese 200g,dairy,FALSE,TRUE,5.39
+P358,Sliced White Bread 600g,bakery,TRUE,TRUE,32.64
+P359,Cream Cheese 150g,dairy,TRUE,TRUE,1.83
+P360,Greek Yogurt 500g,dairy,TRUE,TRUE,3.62
+P361,Pretzels 250g,snacks,TRUE,TRUE,10.29
+P362,Black Tea 20 bags,beverages,TRUE,TRUE,39.91
+P363,Brioche Bun 6pcs,bakery,TRUE,TRUE,39.66
+P364,Goat Cheese 100g,dairy,TRUE,TRUE,28.04
+P365,Butter 250g,dairy,FALSE,TRUE,24.77
+P366,Lemonade 1L,beverages,TRUE,TRUE,5.96
+P367,Sour Cream 200g,dairy,TRUE,TRUE,3.48
+P368,Chicken Thighs 600g,meat,FALSE,TRUE,20.59
+P369,Orange Juice 1L,beverages,FALSE,TRUE,38.77
+P370,Gummy Bears 100g,snacks,FALSE,TRUE,3.52
+P371,Rice Cakes 130g,snacks,TRUE,TRUE,19.95
+P372,Cream Cheese 150g,dairy,FALSE,TRUE,42.15
+P373,Salted Peanuts 200g,snacks,TRUE,TRUE,25.98
+P374,Frozen Berries 300g,frozen,TRUE,TRUE,2.66
+P375,Spinach 250g,produce,FALSE,TRUE,10.38
+P376,Cucumbers 2pcs,produce,TRUE,TRUE,27.25
+P377,Cola 1.5L,beverages,FALSE,TRUE,19.18
+P378,Sliced Bacon 250g,meat,FALSE,TRUE,42.19
+P379,Coffee Beans 250g,beverages,FALSE,TRUE,14.55
+P380,Salted Peanuts 200g,snacks,FALSE,TRUE,22.03
+P381,Coffee Beans 250g,beverages,TRUE,TRUE,46.49
+P382,Ground Beef 500g,meat,TRUE,TRUE,39.6
+P383,Biscuits 200g,snacks,TRUE,TRUE,10.57
+P384,Chicken Breast 500g,meat,FALSE,TRUE,18.85
+P385,Frozen Berries 300g,frozen,FALSE,TRUE,32.49
+P386,Greek Yogurt 500g,dairy,FALSE,TRUE,1.18
+P387,Sourdough Bread 400g,bakery,FALSE,TRUE,20.23
+P388,Spinach 250g,produce,TRUE,TRUE,19.12
+P389,Biscuits 200g,snacks,FALSE,TRUE,24.39
+P390,Sparkling Water 1L,beverages,TRUE,TRUE,47.28
+P391,Cream Cheese 150g,dairy,FALSE,TRUE,48.92
+P392,Sour Cream 200g,dairy,FALSE,TRUE,42.83
+P393,Sourdough Bread 400g,bakery,FALSE,TRUE,1.52
+P394,Butter 250g,dairy,TRUE,TRUE,45.16
+P395,Rice Cakes 130g,snacks,FALSE,TRUE,35.72
+P396,Orange Juice 1L,beverages,FALSE,TRUE,7.62
+P397,Black Tea 20 bags,beverages,FALSE,TRUE,37.45
+P398,Chicken Thighs 600g,meat,FALSE,TRUE,15.97
+P399,Cucumbers 2pcs,produce,FALSE,TRUE,4.12
+P400,Rye Bread 400g,bakery,FALSE,TRUE,5.01
+P401,Pita Bread 5pcs,bakery,FALSE,TRUE,31.24
+P402,Mineral Water 1.5L,beverages,FALSE,TRUE,7.76
+P403,Chicken Thighs 600g,meat,FALSE,TRUE,14.47
+P404,Frozen Lasagna 500g,frozen,TRUE,TRUE,25.04
+P405,Green Tea 20 bags,beverages,TRUE,TRUE,31.63
+P406,Ground Beef 500g,meat,TRUE,TRUE,28.22
+P407,Rice Cakes 130g,snacks,FALSE,TRUE,29.09
+P408,Cola 1.5L,beverages,FALSE,TRUE,10.88
+P409,Sparkling Water 1L,beverages,TRUE,TRUE,20.7
+P410,Vanilla Ice Cream 500ml,frozen,TRUE,TRUE,10.16
+P411,Potato Chips 150g,snacks,TRUE,TRUE,35.05
+P412,Strawberries 250g,produce,FALSE,TRUE,45.86
+P413,Sliced White Bread 600g,bakery,TRUE,TRUE,17.43
+P414,Oat Milk 1L,dairy,TRUE,TRUE,35.25
+P415,Tomatoes 500g,produce,FALSE,TRUE,1.94
+P416,Croissant 2pcs,bakery,FALSE,TRUE,46.06
+P417,Chocolate Bar 100g,snacks,TRUE,TRUE,33.32
+P418,Milk 1L,dairy,TRUE,TRUE,9.34
+P419,Frozen Peas 450g,frozen,TRUE,TRUE,6.81
+P420,Cream Cheese 150g,dairy,TRUE,TRUE,12.52
+P421,Pork Chops 400g,meat,TRUE,TRUE,10.86
+P422,Cola 1.5L,beverages,TRUE,TRUE,34.24
+P423,Sourdough Bread 400g,bakery,FALSE,TRUE,37.16
+P424,Bagel 4pcs,bakery,TRUE,TRUE,40.36
+P425,Oat Milk 1L,dairy,TRUE,TRUE,25.6
+P426,Pretzels 250g,snacks,FALSE,TRUE,8.62
+P427,Black Tea 20 bags,beverages,TRUE,TRUE,47.58
+P428,Vanilla Ice Cream 500ml,frozen,TRUE,TRUE,21.35
+P429,Croissant 2pcs,bakery,TRUE,TRUE,32.11
+P430,Frozen Berries 300g,frozen,FALSE,TRUE,6.39
+P431,Tomatoes 500g,produce,FALSE,TRUE,30.65
+P432,Mozzarella 200g,dairy,TRUE,TRUE,38.65
+P433,Apple Juice 1L,beverages,FALSE,TRUE,40.0
+P434,Oat Milk 1L,dairy,FALSE,TRUE,39.93
+P435,Frozen Berries 300g,frozen,TRUE,TRUE,10.97
+P436,Frozen French Fries 1kg,frozen,TRUE,TRUE,5.21
+P437,Trail Mix 150g,snacks,TRUE,TRUE,47.59
+P438,Ground Beef 500g,meat,TRUE,TRUE,46.46
+P439,Oat Milk 1L,dairy,FALSE,TRUE,20.88
+P440,Frozen Spinach 400g,frozen,TRUE,TRUE,32.88
+P441,Sliced Bacon 250g,meat,FALSE,TRUE,10.63
+P442,Multigrain Bread 500g,bakery,FALSE,TRUE,25.68
+P443,Milk 1L,dairy,FALSE,TRUE,33.62
+P444,Cola 1.5L,beverages,FALSE,TRUE,35.59
+P445,Multigrain Bread 500g,bakery,TRUE,TRUE,31.68
+P446,Sourdough Bread 400g,bakery,TRUE,TRUE,11.47
+P447,Turkey Breast 300g,meat,TRUE,TRUE,4.44
+P448,Green Tea 20 bags,beverages,TRUE,TRUE,7.71
+P449,Pretzels 250g,snacks,FALSE,TRUE,17.01
+P450,Ground Beef 500g,meat,TRUE,TRUE,30.59
+P451,Ciabatta 2pcs,bakery,FALSE,TRUE,40.34
+P452,Multigrain Bread 500g,bakery,FALSE,TRUE,24.45
+P453,Apple Juice 1L,beverages,TRUE,TRUE,3.67
+P454,Potato Chips 150g,snacks,FALSE,TRUE,8.2
+P455,Potatoes 2kg,produce,FALSE,TRUE,36.15
+P456,Ciabatta 2pcs,bakery,TRUE,TRUE,27.01
+P457,Iced Tea 1L,beverages,FALSE,TRUE,7.19
+P458,Apple Juice 1L,beverages,FALSE,TRUE,41.7
+P459,Spinach 250g,produce,FALSE,TRUE,9.21
+P460,Pita Bread 5pcs,bakery,TRUE,TRUE,8.83
+P461,Frozen Lasagna 500g,frozen,TRUE,TRUE,2.64
+P462,Rice Cakes 130g,snacks,TRUE,TRUE,11.77
+P463,Butter 250g,dairy,TRUE,TRUE,21.4
+P464,Spinach 250g,produce,TRUE,TRUE,27.66
+P465,Cucumbers 2pcs,produce,TRUE,TRUE,3.99
+P466,Frozen Pizza 400g,frozen,FALSE,TRUE,4.86
+P467,Chicken Breast 500g,meat,FALSE,TRUE,46.89
+P468,Sausages 6pcs,meat,FALSE,TRUE,27.8
+P469,Tomatoes 500g,produce,FALSE,TRUE,24.93
+P470,Frozen Berries 300g,frozen,FALSE,TRUE,25.8
+P471,Frozen Peas 450g,frozen,FALSE,TRUE,16.12
+P472,Popcorn 100g,snacks,TRUE,TRUE,12.8
+P473,Goat Cheese 100g,dairy,FALSE,TRUE,1.43
+P474,Mozzarella 200g,dairy,FALSE,TRUE,36.15
+P475,Frozen Chicken Nuggets 300g,frozen,TRUE,TRUE,30.32
+P476,Potatoes 2kg,produce,FALSE,TRUE,34.22
+P477,Multigrain Bread 500g,bakery,FALSE,TRUE,45.83
+P478,Sausages 6pcs,meat,FALSE,TRUE,39.88
+P479,Popcorn 100g,snacks,TRUE,TRUE,9.97
+P480,Frozen Lasagna 500g,frozen,TRUE,TRUE,18.74
+P481,Sliced Bacon 250g,meat,TRUE,FALSE,39.4
+P482,Frozen Berries 300g,frozen,FALSE,FALSE,10.74
+P483,Mineral Water 1.5L,beverages,FALSE,FALSE,44.9
+P484,Black Tea 20 bags,beverages,TRUE,FALSE,24.43
+P485,Pita Bread 5pcs,bakery,TRUE,FALSE,23.1
+P486,Cola 1.5L,beverages,TRUE,FALSE,47.33
+P487,Gummy Bears 100g,snacks,TRUE,FALSE,31.24
+P488,Chocolate Bar 100g,snacks,TRUE,FALSE,43.78
+P489,Rye Bread 400g,bakery,TRUE,FALSE,41.92
+P490,Sourdough Bread 400g,bakery,TRUE,FALSE,12.15
+P491,Ciabatta 2pcs,bakery,TRUE,FALSE,41.1
+P492,Iced Tea 1L,beverages,FALSE,FALSE,15.17
+P493,Frozen Pizza 400g,frozen,TRUE,FALSE,45.03
+P494,Sliced Bacon 250g,meat,TRUE,FALSE,8.55
+P495,Whole Wheat Bread 500g,bakery,TRUE,FALSE,4.2
+P496,Sliced White Bread 600g,bakery,FALSE,FALSE,7.35
+P497,Brioche Bun 6pcs,bakery,TRUE,FALSE,22.8
+P498,Sourdough Bread 400g,bakery,TRUE,FALSE,37.2
+P499,Greek Yogurt 500g,dairy,FALSE,FALSE,19.43
+P500,Carrots 1kg,produce,FALSE,FALSE,44.28
