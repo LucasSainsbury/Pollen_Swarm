@@ -1,0 +1,50 @@
+# Product Recommendation Algorithm Configuration
+
+# Scoring component weights (must sum to 1.0)
+scoring_weights:
+  category_affinity: 0.30      # Time-weighted historical category preferences
+  repurchase_likelihood: 0.25  # Grocery-specific repurchase cycle detection
+  clickstream_intent: 0.25     # Real-time browsing behavior
+  product_popularity: 0.10     # Global product popularity
+  exploration: 0.10            # Random component for variety
+
+# Category Affinity parameters
+category_affinity:
+  decay_days: 90  # Number of days for exponential decay (half-life)
+  
+# Repurchase Likelihood parameters
+repurchase_likelihood:
+  expected_cycle_days: 14  # Expected repurchase cycle for grocery items
+  cycle_std_days: 7        # Standard deviation for Gaussian curve
+  min_purchases: 2         # Minimum purchases to calculate cycle
+  
+# Clickstream Intent parameters
+clickstream_intent:
+  recency_weight: 0.7      # Weight for event recency vs event type
+  decay_hours: 24          # Recency decay window in hours
+  event_weights:           # Weights for different event types
+    view: 0.3
+    click: 0.5
+    add_to_cart: 1.0
+    
+# Product Popularity parameters
+product_popularity:
+  customer_weight: 0.6     # Weight for unique customers vs purchase frequency
+  frequency_weight: 0.4
+
+# Constraint filters
+constraints:
+  exclude_recent_purchases_days: 14  # Exclude products purchased in last N days
+  exclude_discounted: true           # Exclude products currently on discount
+  exclude_out_of_stock: true         # Exclude out-of-stock products
+
+# Product selection parameters
+selection:
+  top_k: 20                # Number of top candidates to consider
+  decay_hours: 24          # Hours to track shown products
+  random_seed: null        # Set for reproducibility, null for random
+
+# Logging configuration
+logging:
+  level: INFO              # DEBUG, INFO, WARNING, ERROR
+  verbose: false           # Enable verbose logging with score details

@@ -1,0 +1,13 @@
+customer_id,session_id,event_id,event_timestamp,event_type,page_category,device_type,product_id
+C001,S001,E001,2024-11-20T10:30:00,view,dairy,mobile,P001
+C001,S001,E002,2024-11-20T10:31:15,view,dairy,mobile,P003
+C001,S001,E003,2024-11-20T10:32:00,add_to_cart,dairy,mobile,P001
+C001,S001,E004,2024-11-20T10:35:00,view,bakery,mobile,P002
+C001,S002,E005,2024-11-20T14:15:00,view,produce,desktop,P006
+C002,S003,E006,2024-11-20T09:00:00,view,dairy,mobile,P004
+C002,S003,E007,2024-11-20T09:02:00,click,dairy,mobile,P004
+C002,S003,E008,2024-11-20T09:05:00,view,beverages,mobile,P009
+C003,S004,E009,2024-11-19T16:00:00,view,produce,tablet,P007
+C003,S004,E010,2024-11-19T16:02:00,view,produce,tablet,P006
+C003,S005,E011,2024-11-20T11:00:00,view,pantry,desktop,P012
+C003,S005,E012,2024-11-20T11:05:00,add_to_cart,pantry,desktop,P014
