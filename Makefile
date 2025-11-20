@@ -6,7 +6,7 @@ VENV := venv
 BIN := $(VENV)/bin
 PIP := $(BIN)/pip
 PYTHON_VENV := $(BIN)/python
-HF_TOKEN := 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
+HF_TOKEN := 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
 
 # Export token for all commands
 export HF_TOKEN
