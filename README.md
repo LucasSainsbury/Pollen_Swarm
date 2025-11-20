@@ -4,10 +4,13 @@ A production-ready Python pipeline for generating creative advertising campaign 
 
 ## ✨ Features
 
+- **Themed Product Image Generation**: Automatic multi-theme prompt generation for products (Christmas, Studio, Supermarket, etc.)
+- **Marketing Layout Formatter**: Create professional vertical, square, and horizontal branded layouts
 - **Dual Generation Modes**: Fast API (HuggingFace free tier) or local CPU models
 - **Advanced Post-Processing**: Automatic cropping, color adjustments, brand filters
 - **Multiple Aspect Ratios**: 1:1, 16:9, 9:16, 4:3, 3:4, 21:9, Facebook cover
 - **Brand Color Filters**: 6 preset filters for brand consistency
+- **Pollen Swarm Branding**: Automatic branded overlays with "nectar points" badges
 - **Metadata Tracking**: JSON export of all generation parameters
 - **CLI Interface**: Easy command-line usage with argparse
 - **Production Ready**: Type hints, structured logging, error handling
@@ -27,8 +30,8 @@ A production-ready Python pipeline for generating creative advertising campaign 
 # Create virtual environment and install dependencies
 make venv && make install
 
-# Generate your first image
-make run-example
+# Run demo workflow
+python demo_workflow.py
 ```
 
 **Option 2: Manual Installation**
@@ -40,11 +43,105 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Run demo workflow
+python demo_workflow.py
 ```
+
+### Quick Demo
+
+Try the complete workflow with the demo script:
+
+```bash
+python demo_workflow.py
+```
+
+This will:
+1. Generate themed prompts for a sample product
+2. Create sample images (simulated)
+3. Format images into all three marketing layouts
+4. Show you the complete output structure
 
 ## 📖 Usage
 
-### Basic Usage
+### Part 1: Themed Product Image Generation
+
+Generate marketing images across multiple creative themes for any product.
+
+#### Basic Product Image Generation
+
+```bash
+# Generate all themed images for a product
+python generate_product_images.py \
+  --product "dairy butter no salt (120g)" \
+  --category "Dairy" \
+  --output ./output/butter/
+
+# Generate specific themes only
+python generate_product_images.py \
+  --product "organic honey (250g)" \
+  --category "Condiments" \
+  --themes christmas_festive studio_product supermarket_shelf \
+  --output ./output/honey/
+
+# List all available themes
+python generate_product_images.py --list-themes
+```
+
+#### Available Themes
+
+The system automatically generates prompts for 10+ creative themes:
+- **christmas_festive** - Christmas / Holiday / Festive scenes
+- **studio_product** - Clean studio product shots
+- **supermarket_shelf** - In-store shelf displays
+- **back_to_school** - Back to school themes
+- **cooked_prepared** - Prepared / plated food presentations
+- **summer_outdoor** - Summer outdoor / seasonal
+- **healthy_lifestyle** - Health and fitness contexts
+- **family_home** - Family kitchen / home scenes
+- **premium_luxury** - Luxury / high-end presentations
+- **easter_spring** - Easter / spring seasonal themes
+
+### Part 2: Marketing Layout Formatting
+
+Format generated images into professional marketing layouts with branded themes.
+
+#### Basic Formatting
+
+```bash
+# Vertical banner (portrait)
+python creative_formatter.py \
+  -i input_image.jpg \
+  -l vertical \
+  -n 10
+
+# Square format (1:1)
+python creative_formatter.py \
+  -i input_image.jpg \
+  -l square \
+  -n 15
+
+# Horizontal format (landscape)
+python creative_formatter.py \
+  -i input_image.jpg \
+  -l horizontal \
+  -n 20 \
+  -p right
+```
+
+#### Batch Formatting
+
+```bash
+# Format all images in a directory
+python creative_formatter.py \
+  -i ./generated_images/ \
+  -l vertical \
+  -n 10
+```
+
+### Original Single-Image Generation
+
+Generate single advertising images with custom prompts:
 
 ```bash
 # Activate virtual environment (if not already active)
@@ -144,18 +241,26 @@ python creative_ad_generator.py \
 
 Uses HuggingFace Inference API - fast, no GPU needed, free tier available.
 
-```bash
-# Install lightweight dependencies
-make install
+**Setup:**
+1. Get a free HuggingFace account: https://huggingface.co/join
+2. Create an access token: https://huggingface.co/settings/tokens
+3. Set environment variable:
+   ```bash
+   export HF_TOKEN=your_huggingface_token
+   ```
 
-# Generate images
-python creative_ad_generator.py --prompt "your prompt" --out ./output/
-```
-
-**Tip**: Set `HF_TOKEN` environment variable for higher rate limits:
+**Generate images:**
 ```bash
-export HF_TOKEN=your_huggingface_token
-python creative_ad_generator.py --prompt "your prompt" --out ./output/
+# Single themed product generation
+python generate_product_images.py \
+  --product "dairy butter no salt (120g)" \
+  --category "Dairy" \
+  --output ./output/butter/
+
+# Custom single image
+python creative_ad_generator.py \
+  --prompt "your custom prompt" \
+  --out ./output/
 ```
 
 ### Local Mode (Slower, More Control)
@@ -167,7 +272,58 @@ Runs Stable Diffusion locally on CPU. ⚠️ **Warning**: Very slow on CPU, 4GB+
 make install-local
 
 # Generate with local model
-python creative_ad_generator.py --prompt "your prompt" --out ./output/ --local
+python generate_product_images.py \
+  --product "your product" \
+  --category "category" \
+  --output ./output/ \
+  --local
+```
+
+## 🎨 Complete Workflow Example
+
+Here's a complete end-to-end workflow for creating product marketing materials:
+
+```bash
+# Step 1: Set your HuggingFace token
+export HF_TOKEN=your_token_here
+
+# Step 2: Generate all themed images for a product
+python generate_product_images.py \
+  --product "organic honey (250g)" \
+  --category "Condiments" \
+  --output ./images/honey/ \
+  --aspect 16:9
+
+# This will generate 10+ themed images:
+# - Christmas/festive scene
+# - Clean studio product shot
+# - Supermarket shelf display
+# - Back to school theme
+# - Cooked/prepared presentation
+# - Summer outdoor scene
+# - Healthy lifestyle context
+# - Family home/kitchen
+# - Premium luxury presentation
+# - Easter/spring theme
+
+# Step 3: Format the best images into marketing layouts
+python creative_formatter.py \
+  -i ./images/honey/organic_honey_christmas_festive.jpg \
+  -l vertical \
+  -n 15 \
+  -o ./marketing/honey_christmas_banner.png
+
+python creative_formatter.py \
+  -i ./images/honey/organic_honey_studio_product.jpg \
+  -l square \
+  -n 10 \
+  -o ./marketing/honey_instagram.png
+
+python creative_formatter.py \
+  -i ./images/honey/organic_honey_supermarket_shelf.jpg \
+  -l horizontal \
+  -n 20 \
+  -o ./marketing/honey_website_banner.png
 ```
 
 ## 📋 Built-in Example Prompts
@@ -192,21 +348,50 @@ python creative_ad_generator.py --batch --out ./output/
 
 ## 📁 Output Structure
 
-Each generation creates two files:
+### Product Image Generation
+
+Each theme generates two files:
 
 ```
 output/
-├── example.jpg          # Generated image
-└── example.json         # Metadata file
+├── product_name_theme.jpg       # Generated image
+└── product_name_theme.json      # Metadata file
 ```
 
 **Metadata includes:**
 - Original prompt
+- Theme information (name, description)
+- Product details (name, category)
 - Generation seed (for reproducibility)
 - Timestamp
 - Processing parameters
 - Final image dimensions
 - Generation time
+
+A summary file is also created:
+```
+output/
+└── product_name_generation_summary.json  # Overall generation summary
+```
+
+### Formatted Marketing Layouts
+
+Each formatted image creates:
+
+```
+output/
+├── image_layout.png             # Formatted marketing image
+└── image_layout.json            # Layout metadata
+```
+
+**Layout metadata includes:**
+- Input image path
+- Layout type (vertical/square/horizontal)
+- Nectar points value
+- Image position (for horizontal)
+- Final dimensions
+- Timestamp
+- Original generation metadata (if available)
 
 ## 🛠️ Makefile Commands
 
@@ -247,12 +432,12 @@ If local generation fails with OOM:
 
 ## 📦 Dependencies
 
-**Lightweight (API mode)**:
+**Lightweight (API mode - Required)**:
 - pillow >= 10.0.0
 - numpy >= 1.24.0
-- requests >= 2.31.0
+- huggingface_hub >= 0.20.0
 
-**Heavy (Local mode)**:
+**Heavy (Local mode - Optional)**:
 - torch >= 2.0.0
 - diffusers >= 0.21.0
 - transformers >= 4.30.0
@@ -260,12 +445,82 @@ If local generation fails with OOM:
 
 ## 🎯 Use Cases
 
-- **Marketing Teams**: Generate campaign visuals quickly
-- **Ad Agencies**: Create concept mockups for clients
-- **E-commerce**: Product promotion images
-- **Social Media**: Platform-specific content (stories, posts, banners)
+- **Product Marketing**: Generate themed product images for campaigns
+- **Seasonal Campaigns**: Automatic holiday and seasonal variations
+- **Social Media**: Create branded posts in multiple formats (Stories, Posts, Banners)
+- **E-commerce**: Product promotion images across multiple themes
 - **A/B Testing**: Generate variations for testing
-- **Datasets**: Create labeled training datasets
+- **Retail Marketing**: In-store and online promotional materials
+
+## 📁 Project Structure
+
+```
+Pollen_Swarm/
+├── prompt_generator.py           # Themed prompt generation module
+├── generate_product_images.py    # Batch product image generation
+├── creative_formatter.py          # Marketing layout formatter
+├── creative_ad_generator.py       # Original single image generator
+├── demo_workflow.py               # Complete workflow demonstration
+├── requirements.txt               # Python dependencies
+├── Makefile                       # Build and run commands
+└── README.md                      # This file
+```
+
+## 🔧 API Configuration
+
+### Setting up HuggingFace API Token
+
+For image generation, you need a HuggingFace API token:
+
+1. Create a free account at https://huggingface.co/join
+2. Generate an access token at https://huggingface.co/settings/tokens
+3. Set the environment variable:
+   ```bash
+   export HF_TOKEN=your_token_here
+   ```
+4. Or pass it directly:
+   ```bash
+   python generate_product_images.py --hf-token your_token_here ...
+   ```
+
+## 📝 Extending the Pipeline
+
+### Adding New Themes
+
+Edit `prompt_generator.py` and add to `THEME_TEMPLATES`:
+
+```python
+THEME_TEMPLATES = {
+    "your_theme": (
+        "your template featuring {product_name} from the {category} "
+        "category, your creative description here"
+    ),
+    # ... existing themes
+}
+```
+
+### Customizing Brand Colors
+
+Edit `creative_formatter.py` and modify `BRAND_COLORS`:
+
+```python
+BRAND_COLORS = {
+    'purple': (106, 27, 154),
+    'orange': (255, 152, 0),
+    'your_color': (R, G, B),
+    # ...
+}
+```
+
+### Adding New Layouts
+
+Add a new formatting function in `creative_formatter.py`:
+
+```python
+def format_your_layout(image: Image.Image, nectar_points: int) -> Image.Image:
+    # Your custom layout logic
+    return formatted_image
+```
 
 ## 📝 Example Workflows
 
