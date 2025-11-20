@@ -6,6 +6,10 @@ VENV := venv
 BIN := $(VENV)/bin
 PIP := $(BIN)/pip
 PYTHON_VENV := $(BIN)/python
+HF_TOKEN := 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
+
+# Export token for all commands
+export HF_TOKEN
 
 # Default target
 help:
@@ -21,6 +25,7 @@ help:
 	@echo "  make run-example   - Generate a single example image"
 	@echo "  make run-batch     - Generate all 8 example advertising images"
 	@echo "  make run-custom    - Run with custom prompt (set PROMPT variable)"
+	@echo "  make run-local     - Run with local model (slow on CPU)"
 	@echo ""
 	@echo "Utility Commands:"
 	@echo "  make clean         - Remove generated files and cache"
@@ -58,38 +63,82 @@ install-local: venv
 	@echo "✓ Local model dependencies installed!"
 	@echo "  You can now run with --local flag"
 
-# Run a single example
-run-example: venv
-	@echo "Generating example advertising image..."
+# Add new API example command after run-example
+run-api: venv
+	@echo "Generating image using HuggingFace API (fast, no local model needed)..."
 	@mkdir -p output
-	$(PYTHON_VENV) creative_ad_generator.py \ 
-		--prompt "bright summer supermarket sale with fresh produce, vibrant colors" \ 
-		--out output/example.jpg \ 
-		--aspect 16:9
+	$(PYTHON_VENV) creative_ad_generator.py \
+		--prompt "bright summer supermarket sale with fresh produce, vibrant colors, photorealistic" \
+		--out output/api_example.jpg \
+		--aspect 16:9 \
+		--hf-token $(HF_TOKEN)
+	@echo "✓ Check output/api_example.jpg"
+
+# Update run-example to use API with token
+run-example: venv
+	@echo "Generating example advertising image with API..."
+	@mkdir -p output
+	$(PYTHON_VENV) creative_ad_generator.py \
+		--prompt "bright summer supermarket sale with fresh produce, vibrant colors" \
+		--out output/example.jpg \
+		--aspect 16:9 \
+		--hf-token $(HF_TOKEN)
 	@echo "✓ Check output/example.jpg"
 
-# Run batch generation (all 8 examples)
+# Update run-batch to use token
 run-batch: venv
-	@echo "Generating all 8 example advertising images..."
+	@echo "Generating all 8 example advertising images with API..."
 	@mkdir -p output/batch
-	$(PYTHON_VENV) creative_ad_generator.py \ 
-		--batch \ 
-		--out output/batch/
+	$(PYTHON_VENV) creative_ad_generator.py \
+		--batch \
+		--out output/batch/ \
+		--hf-token $(HF_TOKEN)
 	@echo "✓ Check output/batch/ directory"
 
 # Run with custom prompt
 run-custom: venv
-	@if [ -z "$(PROMPT)" ]; then \ 
-		echo "Error: PROMPT variable not set"; \ 
-		echo "Usage: make run-custom PROMPT='your prompt here'"; \ 
-		exit 1; \ 
+	@if [ -z "$(PROMPT)" ]; then \
+		echo "Error: PROMPT variable not set"; \
+		echo "Usage: make run-custom PROMPT='your prompt here'"; \
+		exit 1; \
 	fi
 	@mkdir -p output
-	$(PYTHON_VENV) creative_ad_generator.py \ 
-		--prompt "$(PROMPT)" \ 
-		--out output/custom.jpg \ 
+	$(PYTHON_VENV) creative_ad_generator.py \
+		--prompt "$(PROMPT)" \
+		--out output/custom.jpg \
 		--aspect $(ASPECT)
 	@echo "✓ Check output/custom.jpg"
 
 # Run with local model (slow on CPU)
-r...
+run-local: venv
+	@echo "⚠️  Running with local model - this will be slow on CPU!"
+	@mkdir -p output
+	$(PYTHON_VENV) creative_ad_generator.py \
+		--prompt "luxury advertising campaign" \
+		--out output/local.jpg \
+		--local
+	@echo "✓ Check output/local.jpg"
+
+# Clean generated files
+clean:
+	@echo "Cleaning generated files..."
+	rm -rf output/
+	rm -rf ads/
+	rm -rf __pycache__/
+	rm -f *.pyc
+	rm -f *.log
+	@echo "✓ Cleaned!"
+
+# Clean everything including venv
+clean-all: clean
+	@echo "Removing virtual environment..."
+	rm -rf $(VENV)/
+	@echo "✓ Everything cleaned!"
+
+# Run tests
+test: venv
+	@echo "Running tests..."
+	$(PYTHON_VENV) -m pytest tests/ -v || echo "No tests found"
+
+# Default aspect ratio for custom runs
+ASPECT ?= 16:9

@@ -45,11 +45,12 @@ import numpy as np
 from PIL import Image, ImageEnhance, ImageFilter
 
 # Optional imports for different modes
+# Replace the requests import section with:
 try:
-    import requests
-    HAS_REQUESTS = True
+    from huggingface_hub import InferenceClient
+    HAS_HF_HUB = True
 except ImportError:
-    HAS_REQUESTS = False
+    HAS_HF_HUB = False
     
 try:
     import torch
@@ -114,28 +115,28 @@ class CreativeImagePipeline:
     Supports both API-based generation (fast, CPU-friendly) and local model
     execution (slower but more control).
     """
-    
+
     def __init__(
-        self,
-        use_local: bool = False,
-        model_name: str = "stabilityai/stable-diffusion-2-1-base",
-        api_url: str = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1",
-        hf_token: Optional[str] = None,
-        brightness: float = 1.1,
-        contrast: float = 1.15,
-        saturation: float = 1.2,
-        sharpness: float = 1.1,
-        aspect_ratio: str = "16:9",
-        brand_filter: Optional[str] = None
+            self,
+            use_local: bool = False,
+            model_name: str = "black-forest-labs/FLUX.1-dev",  # Updated model
+            api_url: str = None,  # No longer needed
+            hf_token: Optional[str] = None,
+            brightness: float = 1.1,
+            contrast: float = 1.15,
+            saturation: float = 1.2,
+            sharpness: float = 1.1,
+            aspect_ratio: str = "16:9",
+            brand_filter: Optional[str] = None
     ):
         """
         Initialize the creative image pipeline.
-        
+
         Args:
             use_local: Whether to use local model (requires GPU/CPU compute)
             model_name: HuggingFace model identifier for local mode
             api_url: API endpoint for remote inference
-            hf_token: HuggingFace API token (optional, for higher rate limits)
+            hf_token: HuggingFace API token (gets from env if not provided)
             brightness: Brightness adjustment factor (1.0 = no change)
             contrast: Contrast adjustment factor (1.0 = no change)
             saturation: Color saturation factor (1.0 = no change)
@@ -146,30 +147,34 @@ class CreativeImagePipeline:
         self.use_local = use_local
         self.model_name = model_name
         self.api_url = api_url
-        self.hf_token = hf_token
+
+        # Prioritize provided token, then environment variable
+        self.hf_token = hf_token or os.getenv("HF_TOKEN")
+        if self.hf_token:
+            logger.info("✓ HuggingFace token loaded")
+        else:
+            logger.warning("No HuggingFace token found - API rate limits will be lower")
+
         self.brightness = brightness
         self.contrast = contrast
         self.saturation = saturation
         self.sharpness = sharpness
         self.aspect_ratio = aspect_ratio
         self.brand_filter = brand_filter
-        
+
         self.pipe = None
-        
+
         if use_local:
             self._initialize_local_model()
         else:
             self._check_api_requirements()
-            
-        logger.info(f"Initialized CreativeImagePipeline (mode: {'local' if use_local else 'api'})")
-    
-    def _check_api_requirements(self) -> None:
-        """Check if API mode requirements are met."""
-        if not HAS_REQUESTS:
-            raise ImportError(
-                "API mode requires 'requests' library. Install with: pip install requests"
+            # Initialize InferenceClient for API mode
+            self.client = InferenceClient(
+                provider="nebius",
+                api_key=self.hf_token
             )
-    
+            logger.info("Using API mode with InferenceClient (fast, recommended for CPU)")
+
     def _initialize_local_model(self) -> None:
         """Initialize local Stable Diffusion model for CPU execution."""
         if not HAS_DIFFUSERS:
@@ -177,30 +182,44 @@ class CreativeImagePipeline:
                 "Local mode requires diffusers and torch. Install with: "
                 "pip install torch torchvision diffusers transformers accelerate"
             )
-        
+
         logger.info(f"Loading local model: {self.model_name}")
         logger.info("⚠️  Note: CPU execution will be slow. Consider using API mode instead.")
-        
+
+        # Check for HuggingFace token
+        token = self.hf_token or os.getenv("HF_TOKEN")
+        if not token:
+            logger.warning("No HuggingFace token found. Some models may require authentication.")
+            logger.info("Set HF_TOKEN environment variable or pass --hf-token")
+
         try:
-            # Load model optimized for CPU
+            # Load model optimized for CPU with authentication
             self.pipe = StableDiffusionPipeline.from_pretrained(
                 self.model_name,
-                torch_dtype=torch.float32,  # Use float32 for CPU
-                safety_checker=None,  # Disable for speed
+                torch_dtype=torch.float32,
+                safety_checker=None,
+                use_auth_token=token
             )
-            
-            # Move to CPU explicitly
+
             self.pipe = self.pipe.to("cpu")
-            
-            # Enable memory optimizations
             self.pipe.enable_attention_slicing()
-            
+
             logger.info("✓ Local model loaded successfully (CPU mode)")
-            
+
         except Exception as e:
             logger.error(f"Failed to load local model: {e}")
+            logger.info("💡 Tip: Try setting HF_TOKEN environment variable")
+            logger.info("💡 Or use API mode without --local flag")
             raise
-    
+
+    def _check_api_requirements(self) -> None:
+        """Check if required packages for API mode are available."""
+        if not HAS_HF_HUB:
+            raise ImportError(
+                "API mode requires 'huggingface_hub' library. Install with: pip install huggingface_hub"
+            )
+        logger.debug("API requirements satisfied")
+
     def generate(
         self,
         prompt: str,
@@ -210,7 +229,7 @@ class CreativeImagePipeline:
         width: int = 512,
         height: int = 512
     ) -> Image.Image:
-        """Generate an image from a text prompt."""
+        """Generate an image from a text prompt.
         
         Args:
             prompt: Text description of the desired image
@@ -226,7 +245,7 @@ class CreativeImagePipeline:
         if seed is None:
             seed = int(time.time())
         
-        logger.info(f"Generating image with prompt: '{prompt[:50]}...'"
+        logger.info(f"Generating image with prompt: '{prompt[:50]}...'")
         logger.info(f"Parameters: seed={seed}, steps={num_inference_steps}, guidance={guidance_scale}")
         
         if self.use_local:
@@ -267,49 +286,32 @@ class CreativeImagePipeline:
         except Exception as e:
             logger.error(f"Local generation failed: {e}")
             raise
-    
+
     def _generate_api(self, prompt: str, seed: int) -> Image.Image:
-        """Generate image using HuggingFace Inference API."""
-        headers = {}
-        if self.hf_token:
-            headers["Authorization"] = f"Bearer {self.hf_token}"
-        
-        payload = {
-            "inputs": prompt,
-            "parameters": {
-                "seed": seed,
-            }
-        }
-        
+        """Generate image using HuggingFace InferenceClient."""
+        if not self.hf_token:
+            raise ValueError("HF_TOKEN is required for API mode. Set environment variable or pass --hf-token")
+
         try:
             logger.info("🔄 Calling HuggingFace Inference API...")
-            response = requests.post(
-                self.api_url,
-                headers=headers,
-                json=payload,
-                timeout=60
+
+            # Generate image using the new client
+            image = self.client.text_to_image(
+                prompt,
+                model=self.model_name
             )
-            
-            if response.status_code == 503:
-                logger.warning("Model is loading... waiting 20s and retrying")
-                time.sleep(20)
-                response = requests.post(self.api_url, headers=headers, json=payload, timeout=60)
-            
-            response.raise_for_status()
-            
-            from io import BytesIO
-            image = Image.open(BytesIO(response.content))
+
             logger.info("✓ API generation successful")
             return image
-            
-        except requests.exceptions.RequestException as e:
+
+        except Exception as e:
             logger.error(f"API request failed: {e}")
-            logger.info("💡 Tip: Set HF_TOKEN environment variable for higher rate limits")
+            logger.info("💡 Check your HF_TOKEN value")
             logger.info("💡 Or use --local flag for local CPU generation (slower)")
             raise
     
     def postprocess(self, image: Image.Image) -> Image.Image:
-        """Apply post-processing enhancements to the generated image."""
+        """Apply post-processing enhancements to the generated image.
         
         Steps:
         1. Crop to target aspect ratio (intelligent center crop)
@@ -362,7 +364,7 @@ class CreativeImagePipeline:
         return image
     
     def _crop_to_aspect_ratio(self, image: Image.Image, aspect_ratio: str) -> Image.Image:
-        """Intelligently crop image to target aspect ratio using center crop."""
+        """Intelligently crop image to target aspect ratio using center crop.
         
         Args:
             image: Input PIL Image
@@ -409,7 +411,7 @@ class CreativeImagePipeline:
         return image
     
     def _apply_brand_filter(self, image: Image.Image, filter_name: str) -> Image.Image:
-        """Apply a brand color filter overlay to the image."""
+        """Apply a brand color filter overlay to the image.
         
         Args:
             image: Input PIL Image
@@ -439,7 +441,7 @@ class CreativeImagePipeline:
         output_path: Union[str, Path],
         metadata: Optional[Dict] = None
     ) -> Tuple[Path, Path]:
-        """Save image and metadata to disk."""
+        """Save image and metadata to disk.
         
         Args:
             image: PIL Image to save
@@ -482,7 +484,7 @@ class CreativeImagePipeline:
         seed: Optional[int] = None,
         **generate_kwargs
     ) -> Tuple[Path, Dict]:
-        """Run the complete pipeline: generate → postprocess → save."""
+        """Run the complete pipeline: generate → postprocess → save.
         
         Args:
             prompt: Text prompt for image generation
