@@ -285,21 +285,21 @@ Examples:
     parser.add_argument(
         "--product", "-p",
         type=str,
-        required=True,
+        required=False,
         help="Product name (e.g., 'dairy butter no salt (120g)')"
     )
     
     parser.add_argument(
         "--category", "-c",
         type=str,
-        required=True,
+        required=False,
         help="Product category (e.g., 'Dairy')"
     )
     
     parser.add_argument(
         "--output", "-o",
         type=str,
-        required=True,
+        required=False,
         help="Output directory for generated images"
     )
     
@@ -384,6 +384,10 @@ Examples:
             print(f"  {theme:25s} - {desc}")
         print()
         return 0
+    
+    # Validate required arguments for image generation
+    if not args.product or not args.category or not args.output:
+        parser.error("--product, --category, and --output are required for image generation")
     
     # Generate images
     try:

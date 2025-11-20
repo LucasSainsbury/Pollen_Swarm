@@ -30,8 +30,8 @@ A production-ready Python pipeline for generating creative advertising campaign 
 # Create virtual environment and install dependencies
 make venv && make install
 
-# Generate your first image
-make run-example
+# Run demo workflow
+python demo_workflow.py
 ```
 
 **Option 2: Manual Installation**
@@ -43,7 +43,24 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Run demo workflow
+python demo_workflow.py
 ```
+
+### Quick Demo
+
+Try the complete workflow with the demo script:
+
+```bash
+python demo_workflow.py
+```
+
+This will:
+1. Generate themed prompts for a sample product
+2. Create sample images (simulated)
+3. Format images into all three marketing layouts
+4. Show you the complete output structure
 
 ## 📖 Usage
 
@@ -224,18 +241,26 @@ python creative_ad_generator.py \
 
 Uses HuggingFace Inference API - fast, no GPU needed, free tier available.
 
-```bash
-# Install lightweight dependencies
-make install
+**Setup:**
+1. Get a free HuggingFace account: https://huggingface.co/join
+2. Create an access token: https://huggingface.co/settings/tokens
+3. Set environment variable:
+   ```bash
+   export HF_TOKEN=your_huggingface_token
+   ```
 
-# Generate images
-python creative_ad_generator.py --prompt "your prompt" --out ./output/
-```
-
-**Tip**: Set `HF_TOKEN` environment variable for higher rate limits:
+**Generate images:**
 ```bash
-export HF_TOKEN=your_huggingface_token
-python creative_ad_generator.py --prompt "your prompt" --out ./output/
+# Single themed product generation
+python generate_product_images.py \
+  --product "dairy butter no salt (120g)" \
+  --category "Dairy" \
+  --output ./output/butter/
+
+# Custom single image
+python creative_ad_generator.py \
+  --prompt "your custom prompt" \
+  --out ./output/
 ```
 
 ### Local Mode (Slower, More Control)
@@ -247,7 +272,58 @@ Runs Stable Diffusion locally on CPU. ⚠️ **Warning**: Very slow on CPU, 4GB+
 make install-local
 
 # Generate with local model
-python creative_ad_generator.py --prompt "your prompt" --out ./output/ --local
+python generate_product_images.py \
+  --product "your product" \
+  --category "category" \
+  --output ./output/ \
+  --local
+```
+
+## 🎨 Complete Workflow Example
+
+Here's a complete end-to-end workflow for creating product marketing materials:
+
+```bash
+# Step 1: Set your HuggingFace token
+export HF_TOKEN=your_token_here
+
+# Step 2: Generate all themed images for a product
+python generate_product_images.py \
+  --product "organic honey (250g)" \
+  --category "Condiments" \
+  --output ./images/honey/ \
+  --aspect 16:9
+
+# This will generate 10+ themed images:
+# - Christmas/festive scene
+# - Clean studio product shot
+# - Supermarket shelf display
+# - Back to school theme
+# - Cooked/prepared presentation
+# - Summer outdoor scene
+# - Healthy lifestyle context
+# - Family home/kitchen
+# - Premium luxury presentation
+# - Easter/spring theme
+
+# Step 3: Format the best images into marketing layouts
+python creative_formatter.py \
+  -i ./images/honey/organic_honey_christmas_festive.jpg \
+  -l vertical \
+  -n 15 \
+  -o ./marketing/honey_christmas_banner.png
+
+python creative_formatter.py \
+  -i ./images/honey/organic_honey_studio_product.jpg \
+  -l square \
+  -n 10 \
+  -o ./marketing/honey_instagram.png
+
+python creative_formatter.py \
+  -i ./images/honey/organic_honey_supermarket_shelf.jpg \
+  -l horizontal \
+  -n 20 \
+  -o ./marketing/honey_website_banner.png
 ```
 
 ## 📋 Built-in Example Prompts
@@ -272,21 +348,50 @@ python creative_ad_generator.py --batch --out ./output/
 
 ## 📁 Output Structure
 
-Each generation creates two files:
+### Product Image Generation
+
+Each theme generates two files:
 
 ```
 output/
-├── example.jpg          # Generated image
-└── example.json         # Metadata file
+├── product_name_theme.jpg       # Generated image
+└── product_name_theme.json      # Metadata file
 ```
 
 **Metadata includes:**
 - Original prompt
+- Theme information (name, description)
+- Product details (name, category)
 - Generation seed (for reproducibility)
 - Timestamp
 - Processing parameters
 - Final image dimensions
 - Generation time
+
+A summary file is also created:
+```
+output/
+└── product_name_generation_summary.json  # Overall generation summary
+```
+
+### Formatted Marketing Layouts
+
+Each formatted image creates:
+
+```
+output/
+├── image_layout.png             # Formatted marketing image
+└── image_layout.json            # Layout metadata
+```
+
+**Layout metadata includes:**
+- Input image path
+- Layout type (vertical/square/horizontal)
+- Nectar points value
+- Image position (for horizontal)
+- Final dimensions
+- Timestamp
+- Original generation metadata (if available)
 
 ## 🛠️ Makefile Commands
 
@@ -355,41 +460,10 @@ Pollen_Swarm/
 ├── generate_product_images.py    # Batch product image generation
 ├── creative_formatter.py          # Marketing layout formatter
 ├── creative_ad_generator.py       # Original single image generator
+├── demo_workflow.py               # Complete workflow demonstration
 ├── requirements.txt               # Python dependencies
 ├── Makefile                       # Build and run commands
 └── README.md                      # This file
-```
-
-## 🎨 Complete Workflow Example
-
-Here's a complete end-to-end workflow:
-
-```bash
-# Step 1: Generate all themed images for a product
-python generate_product_images.py \
-  --product "organic honey (250g)" \
-  --category "Condiments" \
-  --output ./images/honey/ \
-  --aspect 16:9
-
-# Step 2: Format the best images into marketing layouts
-python creative_formatter.py \
-  -i ./images/honey/organic_honey_christmas_festive.jpg \
-  -l vertical \
-  -n 15 \
-  -o ./marketing/honey_christmas_banner.png
-
-python creative_formatter.py \
-  -i ./images/honey/organic_honey_studio_product.jpg \
-  -l square \
-  -n 10 \
-  -o ./marketing/honey_instagram.png
-
-python creative_formatter.py \
-  -i ./images/honey/organic_honey_supermarket_shelf.jpg \
-  -l horizontal \
-  -n 20 \
-  -o ./marketing/honey_website_banner.png
 ```
 
 ## 🔧 API Configuration
