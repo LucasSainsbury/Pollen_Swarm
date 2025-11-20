@@ -6,7 +6,7 @@ export const customers = [
   },
   {
     "id": "C002",
-    "username": "citrus-sparrow-02"
+    "username": "lucas"
   },
   {
     "id": "C003",

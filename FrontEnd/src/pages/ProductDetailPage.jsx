@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { fetchProductById } from "../services/api";
+import { fetchProductById, fetchRecommendation } from "../services/api";
 import { useInteraction } from "../context/InteractionContext";
 import AdPanel from "../components/AdPanel";
 import InteractionFeed from "../components/InteractionFeed";
@@ -10,6 +10,9 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reco, setReco] = useState(null);
+  const [recoError, setRecoError] = useState("");
+  const [recoLoading, setRecoLoading] = useState(false);
   const { trackInteraction, user } = useInteraction();
   const { addToBasket } = useBasket();
   const navigate = useNavigate();
@@ -30,6 +33,24 @@ export default function ProductDetailPage() {
     };
     load();
   }, [id, trackInteraction]);
+
+  useEffect(() => {
+    const runReco = async () => {
+      if (!user?.customerId) return;
+      setRecoLoading(true);
+      setRecoError("");
+      try {
+        const rec = await fetchRecommendation({ customerId: user.customerId });
+        console.log("recome", rec)
+        setReco(rec);
+      } catch (err) {
+        setRecoError(err.message);
+      } finally {
+        setRecoLoading(false);
+      }
+    };
+    runReco();
+  }, [user]);
 
   if (loading) return <p className="muted">Loading product...</p>;
   if (!product) return <p>Not found</p>;
@@ -72,6 +93,21 @@ export default function ProductDetailPage() {
       <aside className="stack">
         <AdPanel />
         <InteractionFeed />
+        {user?.customerId && (
+          <div className="card">
+            <div className="eyebrow">Recommended for you</div>
+            {recoLoading && <p className="muted">Fetching recommendation...</p>}
+            {recoError && <p className="muted">Error: {recoError}</p>}
+            {reco && !recoLoading && (
+              <div className="stack">
+                <div className="basket-name">{reco.product_name}</div>
+                <div className="muted">ID: {reco.recommended_product_id}</div>
+                <div className="muted">Rank: {reco.rank}</div>
+                <div className="muted">Score: {reco.final_score?.toFixed?.(3)}</div>
+              </div>
+            )}
+          </div>
+        )}
       </aside>
     </div>
   );

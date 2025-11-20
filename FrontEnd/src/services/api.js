@@ -2,6 +2,16 @@ import { products } from "../data/products";
 import { usernameToCustomerId, customerIdToUsername } from "../data/customerMap";
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const RECO_API_BASE = "http://0.0.0.0:8000";
+const RECO_PRODUCTS_PATH =
+  import.meta.env.VITE_RECO_PRODUCTS_PATH ||
+  "data/products.csv";
+const RECO_TRANSACTIONS_PATH =
+  import.meta.env.VITE_RECO_TRANSACTIONS_PATH ||
+  "data/transactions.csv";
+const RECO_CLICKSTREAM_PATH =
+  import.meta.env.VITE_RECO_CLICKSTREAM_PATH ||
+  "data/clickstream.csv";
 
 export async function fetchUserProfile(identifier) {
   await delay(250);
@@ -44,6 +54,33 @@ export async function fetchProducts(query = "") {
 export async function fetchProductById(id) {
   await delay(120);
   return products.find((p) => p.id === id);
+}
+
+export async function fetchRecommendation({
+  customerId,
+  productsPath = RECO_PRODUCTS_PATH,
+  transactionsPath = RECO_TRANSACTIONS_PATH,
+  clickstreamPath = RECO_CLICKSTREAM_PATH
+}) {
+  const resp = await fetch(`${RECO_API_BASE}/recommend`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      customer_id: customerId,
+      products_path: productsPath,
+      transactions_path: transactionsPath,
+      clickstream_path: clickstreamPath
+    })
+  });
+
+  if (!resp.ok) {
+    const detail = await resp.text();
+    throw new Error(
+      `Recommendation API failed (${resp.status}): ${detail || resp.statusText}`
+    );
+  }
+
+  return resp.json();
 }
 
 export async function fetchRandomCreative() {
