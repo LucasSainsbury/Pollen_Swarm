@@ -74,6 +74,9 @@ BRAND_COLORS = {
     'gray_light': (245, 245, 245),
 }
 
+# Fallback color for edge cases
+FALLBACK_NEUTRAL_COLOR = (128, 128, 128)
+
 # Layout dimensions
 LAYOUT_SIZES = {
     'vertical': (1080, 1920),
@@ -157,13 +160,13 @@ def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> T
     pixels = list(region.getdata())
     if not pixels:
         # Fallback to neutral color if no pixels
-        return (128, 128, 128)
+        return FALLBACK_NEUTRAL_COLOR
     
     # Check if pixels have RGB channels
     first_pixel = pixels[0]
     if not isinstance(first_pixel, tuple) or len(first_pixel) < 3:
         # Fallback to neutral color for non-RGB data
-        return (128, 128, 128)
+        return FALLBACK_NEUTRAL_COLOR
     
     r_avg = sum(p[0] for p in pixels) // len(pixels)
     g_avg = sum(p[1] for p in pixels) // len(pixels)
@@ -210,33 +213,30 @@ def create_smart_overlay(
 def create_transparency_fade(width: int, height: int, direction: str = 'down', smoothness: float = 1.5) -> Image.Image:
     """Create gradient transparency overlay for smooth transitions with enhanced blending."""
     fade = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-    pixels = fade.load()
+    draw = ImageDraw.Draw(fade)
 
     if direction == 'down':
         for y in range(height):
             # Use power function for smoother, more natural fade
             ratio = (y / height) ** smoothness
             alpha = int(ratio * 255)
-            for x in range(width):
-                pixels[x, y] = (0, 0, 0, alpha)
+            # Draw entire line at once for better performance
+            draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
     elif direction == 'up':
         for y in range(height):
             ratio = (1 - y / height) ** smoothness
             alpha = int(ratio * 255)
-            for x in range(width):
-                pixels[x, y] = (0, 0, 0, alpha)
+            draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
     elif direction == 'left':
         for x in range(width):
             ratio = (x / width) ** smoothness
             alpha = int(ratio * 255)
-            for y in range(height):
-                pixels[x, y] = (0, 0, 0, alpha)
+            draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
     elif direction == 'right':
         for x in range(width):
             ratio = (1 - x / width) ** smoothness
             alpha = int(ratio * 255)
-            for y in range(height):
-                pixels[x, y] = (0, 0, 0, alpha)
+            draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
 
     return fade
 
