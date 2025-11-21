@@ -31,7 +31,7 @@ class ProductRequest(BaseModel):
     theme: Optional[str] = "christmas_festive"
     layout: Optional[str] = "square"
     seed: Optional[int] = 10
-    hf_token: Optional[str] = "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"
+    hf_token: Optional[str] = ""
 
 
 @app.post("/generate-image")
