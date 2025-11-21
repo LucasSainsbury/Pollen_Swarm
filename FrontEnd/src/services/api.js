@@ -110,11 +110,19 @@ export async function fetchGeneratedImage({
     );
   }
 
-  const data = await resp.json();
-  if (!data.image_base64) {
-    throw new Error("No image returned from generator");
+  const contentType = resp.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    const data = await resp.json();
+    if (!data.image_base64) {
+      throw new Error("No image returned from generator");
+    }
+    return `data:image/png;base64,${data.image_base64}`;
   }
-  return `data:image/png;base64,${data.image_base64}`;
+
+  // Fall back to binary response (older API)
+  const blob = await resp.blob();
+  return URL.createObjectURL(blob);
 }
 
 export async function fetchRandomCreative() {

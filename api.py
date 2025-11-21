@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from pathlib import Path
 import tempfile
 import shutil
+import base64
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,6 +32,8 @@ class ProductRequest(BaseModel):
     theme: Optional[str] = "christmas_festive"
     layout: Optional[str] = "square"
     seed: Optional[int] = 10
+    hf_token: Optional[str] = "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"
+    as_base64: Optional[bool] = True
 
 
 @app.post("/generate-image")
@@ -101,21 +104,35 @@ async def generate_product_image(request: ProductRequest):
             if not Path(output_path).exists():
                 raise HTTPException(status_code=500, detail="Image formatting failed")
 
-            # Copy to a permanent location temporarily (FastAPI will serve it)
-            final_output = Path("temp_output.png")
-            shutil.copy(output_path, final_output)
+            if request.as_base64:
+                with open(output_path, "rb") as f:
+                    encoded = base64.b64encode(f.read()).decode("utf-8")
+                return {
+                    "image_base64": encoded,
+                    "product_name": request.product_name,
+                    "product_category": request.product_category,
+                    "layout": request.layout,
+                    "theme": request.theme
+                }
+            else:
+                # Copy to a permanent location temporarily (FastAPI will serve it)
+                final_output = Path("temp_output.png")
+                shutil.copy(output_path, final_output)
 
-            return FileResponse(
-                path=final_output,
-                media_type="image/png",
-                filename=f"{request.product_name.replace(' ', '_')}.png",
-                background=None
-            )
+                return FileResponse(
+                    path=final_output,
+                    media_type="image/png",
+                    filename=f"{request.product_name.replace(' ', '_')}.png",
+                    background=None
+                )
 
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
 
-
+@app.options("/generate-image")
+def options_generate_image():
+    return {}
+    
 @app.get("/")
 async def root():
     return {

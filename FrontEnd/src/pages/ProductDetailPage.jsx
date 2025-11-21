@@ -7,7 +7,6 @@ import {
 } from "../services/api";
 import { useInteraction } from "../context/InteractionContext";
 import AdPanel from "../components/AdPanel";
-import InteractionFeed from "../components/InteractionFeed";
 import { useBasket } from "../context/BasketContext";
 
 export default function ProductDetailPage() {
@@ -118,31 +117,6 @@ export default function ProductDetailPage() {
       </section>
       <aside className="stack">
         <AdPanel />
-        <InteractionFeed />
-        {user?.customerId && (
-          <div className="card">
-            <div className="eyebrow">Recommended for you</div>
-            {recoLoading && <p className="muted">Fetching recommendation...</p>}
-            {recoError && <p className="muted">Error: {recoError}</p>}
-            {reco && !recoLoading && (
-              <div className="stack">
-                <div className="basket-name">{reco.product_name}</div>
-                <div className="muted">ID: {reco.recommended_product_id}</div>
-                <div className="muted">Rank: {reco.rank}</div>
-                <div className="muted">Score: {reco.final_score?.toFixed?.(3)}</div>
-                {creativeLoading && <p className="muted">Rendering creative...</p>}
-                {creativeError && <p className="muted">Creative error: {creativeError}</p>}
-                {creativeSrc && (
-                  <img
-                    src={creativeSrc}
-                    alt={reco.product_name}
-                    style={{ width: "100%", borderRadius: "10px", marginTop: "8px" }}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-        )}
       </aside>
     </div>
   );
