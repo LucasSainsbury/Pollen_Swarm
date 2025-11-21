@@ -193,8 +193,10 @@ def add_noise_overlay(
             gray = 128 + noise_val
             pixels[x, y] = (gray, gray, gray)
     
-    # Scale up noise and blend
-    noise = noise.resize((width, height), Image.Resampling.NEAREST)
+    # Scale up noise with smoother resampling for better quality
+    # Use NEAREST for grain_size=1 (fine grain), BILINEAR for larger grains
+    resample_method = Image.Resampling.NEAREST if grain_size == 1 else Image.Resampling.BILINEAR
+    noise = noise.resize((width, height), resample_method)
     result = Image.blend(image, noise, 0.1)
     
     return result
@@ -304,12 +306,25 @@ def draw_brand_widget(
     
     # Add brand text along the curve (simplified positioning)
     # Position text in the lower-right area of the widget
-    try:
-        # Try to load a nice font
-        font_size = max(int(widget_size * 0.2), 24)
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-        font = ImageFont.truetype(font_path, font_size)
-    except:
+    font_size = max(int(widget_size * 0.2), 24)
+    
+    # Try multiple font paths for cross-platform compatibility
+    font_paths = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+        "C:\\Windows\\Fonts\\arialbd.ttf",
+        "arial.ttf",
+    ]
+    
+    font = None
+    for font_path in font_paths:
+        try:
+            font = ImageFont.truetype(font_path, font_size)
+            break
+        except:
+            continue
+    
+    if font is None:
         font = ImageFont.load_default()
     
     # Calculate text position (bottom-right corner with padding)

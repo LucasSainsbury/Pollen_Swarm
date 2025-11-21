@@ -31,7 +31,7 @@ Layout Options:
 
 Professional Advertisement Features:
 ✓ Smart color-matched overlay transitions
-✓ Prominent "POLLEN SWARM" branding bar
+✓ Elegant quarter-circle brand widget
 ✓ Decorative corner accents
 ✓ Multi-layer text shadows and glows
 ✓ Gradient accent stripes
@@ -464,40 +464,6 @@ def create_pollen_swarm_branding(width: int, height: int, style: str = 'logo') -
         draw.text((text2_x, text2_y), text2, font=font_swarm, fill=BRAND_COLORS['orange'])
 
     return branding
-
-
-def create_enhanced_branding_bar(width: int, height: int) -> Image.Image:
-    """Create a prominent branded bar with Pollen Swarm branding efficiently."""
-    bar = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(bar)
-    
-    # Gradient background using line drawing for better performance
-    for y in range(height):
-        ratio = y / height
-        r = int(BRAND_COLORS['purple'][0] * (1 - ratio * 0.3))
-        g = int(BRAND_COLORS['purple'][1] * (1 - ratio * 0.3))
-        b = int(BRAND_COLORS['purple'][2] * (1 - ratio * 0.3))
-        
-        # Draw entire line at once
-        draw.line([(0, y), (width, y)], fill=(r, g, b, 240))
-    
-    # Decorative stripe at top
-    draw.rectangle([0, 0, width, 4], fill=BRAND_COLORS['orange'])
-    
-    # Pollen Swarm text
-    font_brand = get_default_font(int(height * 0.45), bold=True)
-    text = "POLLEN SWARM"
-    bbox = draw.textbbox((0, 0), text, font=font_brand)
-    text_width = bbox[2] - bbox[0]
-    text_x = (width - text_width) // 2
-    text_y = (height - (bbox[3] - bbox[1])) // 2
-    
-    # Text shadow for depth
-    draw.text((text_x + 2, text_y + 2), text, font=font_brand, fill=(0, 0, 0, 100))
-    draw.text((text_x, text_y), text, font=font_brand, fill=BRAND_COLORS['white'])
-    
-    return bar
-
 
 
 def format_vertical_premium(
