@@ -190,7 +190,7 @@ def add_noise_overlay(
     for y in range(height // grain_size):
         for x in range(width // grain_size):
             noise_val = random.randint(-intensity, intensity)
-            gray = 128 + noise_val
+            gray = max(0, min(255, 128 + noise_val))  # Clamp to valid range
             pixels[x, y] = (gray, gray, gray)
     
     # Scale up noise with smoother resampling for better quality
@@ -321,7 +321,7 @@ def draw_brand_widget(
         try:
             font = ImageFont.truetype(font_path, font_size)
             break
-        except:
+        except (OSError, IOError):
             continue
     
     if font is None:

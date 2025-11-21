@@ -107,7 +107,7 @@ def get_default_font(size: int, bold: bool = False):
     for font_path in font_names:
         try:
             return ImageFont.truetype(font_path, size)
-        except:
+        except (OSError, IOError):
             continue
 
     return ImageFont.load_default()
@@ -1056,11 +1056,14 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python creative_formatter_pro.py -i input.jpg -l vertical \\
+  python creative_formatter.py -i input.jpg -l vertical \\
     --product "Organic Honey" --tagline "Pure Natural Sweetness" -n 15
 
-  python creative_formatter_pro.py -i input.jpg -l square \\
+  python creative_formatter.py -i input.jpg -l square \\
     --product "Honey" --flavor "Trusted by beekeepers"
+  
+  python creative_formatter.py -i input.jpg -l horizontal \\
+    --product "Premium Honey" --vignette --noise
         """
     )
 
