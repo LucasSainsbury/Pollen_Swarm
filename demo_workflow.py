@@ -23,7 +23,7 @@ DEMO_PRODUCTS = [
     {
         'product': 'organic honey (250g)',
         'category': 'Condiments',
-        'themes': ['christmas_festive', 'studio_product', 'supermarket_shelf'],
+        'themes': ['christmas_festive', 'supermarket_shelf'],
         'name': 'Organic Honey',
         'tagline': 'Pure Natural Sweetness',
         'flavor_vertical': 'Ethically sourced from local beekeepers',
@@ -96,6 +96,20 @@ def format_generated_images(
             'layout': 'square',
             'flavor': product_data['flavor_square'],
             'description': 'Square (1:1)',
+        }
+    ]
+
+    '''
+    layouts_config = [
+        {
+            'layout': 'vertical',
+            'flavor': product_data['flavor_vertical'],
+            'description': 'Portrait (9:16)',
+        },
+        {
+            'layout': 'square',
+            'flavor': product_data['flavor_square'],
+            'description': 'Square (1:1)',
         },
         {
             'layout': 'horizontal',
@@ -103,6 +117,7 @@ def format_generated_images(
             'description': 'Landscape (16:9)',
         }
     ]
+    '''
 
     print(f"  Base image: {base_image.stem}\n")
 

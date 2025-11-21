@@ -3,22 +3,42 @@
 Enterprise Creative Image Formatter for Marketing Layouts
 ===========================================================
 
-Professional-grade formatter with cohesive, polished design:
-- Sophisticated gradient layering and color transitions
-- Seamless transparency fade zones between sections
-- Premium Pollen Swarm branding integration
-- Coherent overlay systems tying all elements together
-- Professional typography with visual hierarchy
-- Refined spacing and composition
+Professional-grade formatter with cohesive, polished design optimized for
+creating stunning advertisement materials with seamless brand integration.
 
-Features:
-- Multi-layer gradient backgrounds with smooth transitions
-- Transparency fade overlays for seamless transitions
-- Integrated brand identity throughout
-- Overlapping design elements for cohesion
-- Premium accent elements and decorative details
-- Professional badge and branding placement
-- High-end visual polish and refinement
+Key Features:
+- **Smart Transparent Overlays**: Multi-layer transparency system that intelligently
+  blends design elements with the product image for cohesive composition
+- **Adaptive Color Matching**: Extracts dominant colors from images to create
+  smart gradients that smoothly transition between image and design elements
+- **Prominent Pollen Swarm Branding**: Dedicated branded section with enhanced
+  visibility and professional presentation throughout all layouts
+- **Smooth Gradient Transitions**: Non-linear gradient algorithms with variable
+  transparency for natural, professional-looking color flows
+- **Professional Polish Elements**: Corner accents, multi-layer shadows, glows,
+  and decorative elements for high-end advertisement quality
+- **Enhanced Typography**: Multi-layer text effects with shadows and backgrounds
+  for improved readability and visual hierarchy
+- **Overlapping Design System**: Strategic element placement that creates depth
+  and ties the composition together
+- **Adaptive Transparency Fades**: Smoothness-controlled fade overlays in all
+  directions for seamless image-to-design transitions
+
+Layout Options:
+- Vertical (1080x1920) - Instagram Stories, Portrait ads
+- Square (1080x1080) - Social media posts, Square ads
+- Horizontal (1920x1080) - Website banners, Landscape ads
+
+Professional Advertisement Features:
+✓ Smart color-matched overlay transitions
+✓ Prominent "POLLEN SWARM" branding bar
+✓ Decorative corner accents
+✓ Multi-layer text shadows and glows
+✓ Gradient accent stripes
+✓ Premium nectar points badges
+✓ Adaptive transparency blending
+✓ High-contrast text with subtle backgrounds
+✓ Brand-consistent color palette integration
 """
 
 import argparse
@@ -53,6 +73,9 @@ BRAND_COLORS = {
     'gray_dark': (40, 40, 40),
     'gray_light': (245, 245, 245),
 }
+
+# Fallback color for edge cases
+FALLBACK_NEUTRAL_COLOR = (128, 128, 128)
 
 # Layout dimensions
 LAYOUT_SIZES = {
@@ -109,21 +132,111 @@ def create_gradient(
     return gradient
 
 
-def create_transparency_fade(width: int, height: int, direction: str = 'down') -> Image.Image:
-    """Create gradient transparency overlay for smooth transitions."""
+def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> Tuple[int, int, int]:
+    """Extract dominant color from image for smart gradient matching."""
+    # Ensure image is in RGB mode
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+
+    # Sample a region of the image
+    w, h = image.size
+    if sample_area == 'center':
+        box = (w // 4, h // 4, 3 * w // 4, 3 * h // 4)
+    elif sample_area == 'bottom':
+        box = (0, 3 * h // 4, w, h)
+    elif sample_area == 'top':
+        box = (0, 0, w, h // 4)
+    elif sample_area == 'right':
+        box = (3 * w // 4, 0, w, h)
+    elif sample_area == 'left':
+        box = (0, 0, w // 4, h)
+    else:
+        box = (0, 0, w, h)
+
+    region = image.crop(box)
+    region = region.resize((50, 50), Image.Resampling.LANCZOS)
+
+    # Get average color - safely handle all pixel data
+    pixels = list(region.getdata())
+    if not pixels:
+        # Fallback to neutral color if no pixels
+        return FALLBACK_NEUTRAL_COLOR
+
+    # Check if pixels have RGB channels
+    first_pixel = pixels[0]
+    if not isinstance(first_pixel, tuple) or len(first_pixel) < 3:
+        # Fallback to neutral color for non-RGB data
+        return FALLBACK_NEUTRAL_COLOR
+
+    r_avg = sum(p[0] for p in pixels) // len(pixels)
+    g_avg = sum(p[1] for p in pixels) // len(pixels)
+    b_avg = sum(p[2] for p in pixels) // len(pixels)
+
+    # Slightly desaturate for better overlay blending
+    avg = (r_avg + g_avg + b_avg) // 3
+    r_avg = int(r_avg * 0.7 + avg * 0.3)
+    g_avg = int(g_avg * 0.7 + avg * 0.3)
+    b_avg = int(b_avg * 0.7 + avg * 0.3)
+
+    return (r_avg, g_avg, b_avg)
+
+
+def create_smart_overlay(
+        width: int,
+        height: int,
+        base_color: Tuple[int, int, int],
+        brand_color: Tuple[int, int, int],
+        alpha: int = 180
+) -> Image.Image:
+    """Create a smart overlay that blends image colors with brand colors efficiently."""
+    overlay = Image.new('RGBA', (width, height))
+
+    # Use ImageDraw for more efficient rendering
+    draw = ImageDraw.Draw(overlay)
+
+    # Create a gradient from extracted color to brand color
+    for y in range(height):
+        ratio = (y / height) ** 1.2
+        r = int(base_color[0] * (1 - ratio) + brand_color[0] * ratio)
+        g = int(base_color[1] * (1 - ratio) + brand_color[1] * ratio)
+        b = int(base_color[2] * (1 - ratio) + brand_color[2] * ratio)
+
+        # Vary alpha for smoother transitions
+        line_alpha = int(alpha * (0.3 + 0.7 * ratio))
+
+        # Draw entire line at once instead of pixel by pixel
+        draw.line([(0, y), (width, y)], fill=(r, g, b, line_alpha))
+
+    return overlay
+
+
+def create_transparency_fade(width: int, height: int, direction: str = 'down', smoothness: float = 1.5) -> Image.Image:
+    """Create gradient transparency overlay for smooth transitions with enhanced blending."""
     fade = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-    pixels = fade.load()
+    draw = ImageDraw.Draw(fade)
 
     if direction == 'down':
         for y in range(height):
-            alpha = int((y / height) * 255)
-            for x in range(width):
-                pixels[x, y] = (0, 0, 0, alpha)
+            # Use power function for smoother, more natural fade
+            ratio = (y / height) ** smoothness
+            alpha = int(ratio * 255)
+            # Draw entire line at once for better performance
+            draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
     elif direction == 'up':
         for y in range(height):
-            alpha = int((1 - y / height) * 255)
-            for x in range(width):
-                pixels[x, y] = (0, 0, 0, alpha)
+            ratio = (1 - y / height) ** smoothness
+            alpha = int(ratio * 255)
+            draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
+    elif direction == 'left':
+        for x in range(width):
+            ratio = (x / width) ** smoothness
+            alpha = int(ratio * 255)
+            draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
+    elif direction == 'right':
+        for x in range(width):
+            ratio = (1 - x / width) ** smoothness
+            alpha = int(ratio * 255)
+            draw.line([(x, 0), (x, height)], fill=(0, 0, 0, alpha))
 
     return fade
 
@@ -254,45 +367,135 @@ def create_premium_badge(
     return badge_with_grad
 
 
-def create_pollen_swarm_branding(width: int, height: int) -> Image.Image:
-    """Create Pollen Swarm branding element."""
+def create_corner_accent(size: int, color: Tuple[int, int, int]) -> Image.Image:
+    """Create decorative corner accent for professional polish."""
+    accent = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(accent)
+
+    # Create a subtle corner design
+    thickness = max(3, size // 30)
+
+    # L-shaped corner
+    draw.line([(0, 0), (size, 0)], fill=(*color, 200), width=thickness)
+    draw.line([(0, 0), (0, size)], fill=(*color, 200), width=thickness)
+
+    # Additional accent lines for depth
+    offset = thickness + 2
+    draw.line([(0, offset), (size - offset, offset)], fill=(*color, 120), width=thickness - 1)
+    draw.line([(offset, 0), (offset, size - offset)], fill=(*color, 120), width=thickness - 1)
+
+    return accent
+
+
+def create_pollen_swarm_branding(width: int, height: int, style: str = 'logo') -> Image.Image:
+    """Create enhanced Pollen Swarm branding element with multiple styles."""
     branding = Image.new('RGBA', (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(branding)
 
-    # Draw hexagon/flower shape
     center_x, center_y = width // 2, height // 2
-    radius = min(width, height) // 3
 
-    # Hexagon points
-    angles = [i * 60 for i in range(6)]
-    points = []
-    for angle in angles:
-        rad = math.radians(angle)
-        x = center_x + radius * math.cos(rad)
-        y = center_y + radius * math.sin(rad)
-        points.append((x, y))
+    if style == 'logo':
+        # Hexagon/flower logo
+        radius = min(width, height) // 3
+        angles = [i * 60 for i in range(6)]
+        points = []
+        for angle in angles:
+            rad = math.radians(angle)
+            x = center_x + radius * math.cos(rad)
+            y = center_y + radius * math.sin(rad)
+            points.append((x, y))
 
-    # Draw hexagon with gradient effect
-    draw.polygon(points, fill=(*BRAND_COLORS['orange'], 200), outline=(*BRAND_COLORS['white'], 200))
+        # Draw hexagon with gradient effect and glow
+        draw.polygon(points, fill=(*BRAND_COLORS['orange'], 220), outline=(*BRAND_COLORS['white'], 255))
 
-    # Add center circle
-    circle_radius = radius // 2
-    draw.ellipse(
-        [center_x - circle_radius, center_y - circle_radius,
-         center_x + circle_radius, center_y + circle_radius],
-        fill=(*BRAND_COLORS['white'], 255)
-    )
+        # Add center circle
+        circle_radius = radius // 2
+        draw.ellipse(
+            [center_x - circle_radius, center_y - circle_radius,
+             center_x + circle_radius, center_y + circle_radius],
+            fill=(*BRAND_COLORS['white'], 255)
+        )
 
-    # Add text
-    font_brand = get_default_font(int(height * 0.35), bold=True)
-    text = "PS"
-    bbox = draw.textbbox((0, 0), text, font=font_brand)
-    text_width = bbox[2] - bbox[0]
-    text_x = center_x - text_width // 2
-    text_y = center_y - (bbox[3] - bbox[1]) // 2
-    draw.text((text_x, text_y), text, font=font_brand, fill=BRAND_COLORS['orange'])
+        # Add text
+        font_brand = get_default_font(int(height * 0.35), bold=True)
+        text = "PS"
+        bbox = draw.textbbox((0, 0), text, font=font_brand)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+        text_x = center_x - text_width // 2
+        text_y = center_y - text_height // 2
+        draw.text((text_x, text_y), text, font=font_brand, fill=BRAND_COLORS['orange'])
+
+    elif style == 'badge':
+        # Full branded badge with text
+        padding = int(width * 0.1)
+
+        # Background with rounded corners
+        draw.rounded_rectangle(
+            [padding, padding, width - padding, height - padding],
+            radius=height // 6,
+            fill=(*BRAND_COLORS['purple'], 230)
+        )
+
+        # Border accent
+        draw.rounded_rectangle(
+            [padding + 3, padding + 3, width - padding - 3, height - padding - 3],
+            radius=height // 6,
+            outline=(*BRAND_COLORS['orange'], 200),
+            width=3
+        )
+
+        # Pollen Swarm text
+        font_brand = get_default_font(int(height * 0.28), bold=True)
+        text = "POLLEN"
+        bbox = draw.textbbox((0, 0), text, font=font_brand)
+        text_width = bbox[2] - bbox[0]
+        text_x = center_x - text_width // 2
+        text_y = int(height * 0.25)
+        draw.text((text_x, text_y), text, font=font_brand, fill=BRAND_COLORS['white'])
+
+        font_swarm = get_default_font(int(height * 0.28), bold=True)
+        text2 = "SWARM"
+        bbox2 = draw.textbbox((0, 0), text2, font=font_swarm)
+        text2_width = bbox2[2] - bbox2[0]
+        text2_x = center_x - text2_width // 2
+        text2_y = int(height * 0.55)
+        draw.text((text2_x, text2_y), text2, font=font_swarm, fill=BRAND_COLORS['orange'])
 
     return branding
+
+
+def create_enhanced_branding_bar(width: int, height: int) -> Image.Image:
+    """Create a prominent branded bar with Pollen Swarm branding efficiently."""
+    bar = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(bar)
+
+    # Gradient background using line drawing for better performance
+    for y in range(height):
+        ratio = y / height
+        r = int(BRAND_COLORS['purple'][0] * (1 - ratio * 0.3))
+        g = int(BRAND_COLORS['purple'][1] * (1 - ratio * 0.3))
+        b = int(BRAND_COLORS['purple'][2] * (1 - ratio * 0.3))
+
+        # Draw entire line at once
+        draw.line([(0, y), (width, y)], fill=(r, g, b, 240))
+
+    # Decorative stripe at top
+    draw.rectangle([0, 0, width, 4], fill=BRAND_COLORS['orange'])
+
+    # Pollen Swarm text
+    font_brand = get_default_font(int(height * 0.45), bold=True)
+    text = "POLLEN SWARM"
+    bbox = draw.textbbox((0, 0), text, font=font_brand)
+    text_width = bbox[2] - bbox[0]
+    text_x = (width - text_width) // 2
+    text_y = (height - (bbox[3] - bbox[1])) // 2
+
+    # Text shadow for depth
+    draw.text((text_x + 2, text_y + 2), text, font=font_brand, fill=(0, 0, 0, 100))
+    draw.text((text_x, text_y), text, font=font_brand, fill=BRAND_COLORS['white'])
+
+    return bar
 
 
 def format_vertical_premium(
@@ -302,25 +505,38 @@ def format_vertical_premium(
         nectar_points: int = 10,
         flavor_text: str = "Trusted quality"
 ) -> Image.Image:
-    """Premium vertical banner with cohesive design."""
+    """Premium vertical banner with enhanced cohesive design and prominent branding."""
     width, height = LAYOUT_SIZES['vertical']
     output = Image.new('RGB', (width, height), color=BRAND_COLORS['white'])
 
     # Image section
-    img_height = int(height * 0.56)
-    overlap_zone = int(height * 0.08)  # Transition zone
+    img_height = int(height * 0.55)
+    overlap_zone = int(height * 0.10)  # Larger transition zone
     text_start = img_height - overlap_zone
 
     processed_img = resize_and_crop(image, width, img_height, crop_position='center')
     output.paste(processed_img, (0, 0))
 
-    # Fade overlay at bottom of image for smooth transition
-    fade = create_transparency_fade(width, overlap_zone * 3, direction='down')
-    fade_rgb = Image.new('RGB', (width, overlap_zone * 3), color=BRAND_COLORS['purple'])
-    fade_with_trans = Image.new('RGBA', (width, overlap_zone * 3))
-    fade_with_trans.paste(fade_rgb, (0, 0))
-    fade_with_trans.putalpha(fade.split()[3])
-    output.paste(fade_with_trans, (0, text_start), fade_with_trans)
+    # Extract dominant color from bottom of image for smart blending
+    dominant_color = extract_dominant_color(processed_img, 'bottom')
+
+    # Apply subtle darkening overlay on bottom of image for better text contrast
+    dark_overlay = Image.new('RGBA', (width, overlap_zone * 2), (0, 0, 0, 0))
+    dark_draw = ImageDraw.Draw(dark_overlay)
+    for y in range(overlap_zone * 2):
+        alpha = int((y / (overlap_zone * 2)) * 100)
+        dark_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
+    output.paste(dark_overlay, (0, img_height - overlap_zone * 2), dark_overlay)
+
+    # Smart color-matched overlay for smooth transition
+    smart_overlay = create_smart_overlay(
+        width,
+        overlap_zone * 3,
+        dominant_color,
+        BRAND_COLORS['purple'],
+        alpha=160
+    )
+    output.paste(smart_overlay, (0, text_start - overlap_zone), smart_overlay)
 
     # Main background gradient for text area
     gradient_height = height - text_start
@@ -336,35 +552,55 @@ def format_vertical_premium(
 
     draw = ImageDraw.Draw(output)
 
-    # Decorative stripe with accent
-    stripe_height = 8
+    # Decorative accent stripe with gradient
+    stripe_height = 6
     stripe_y = text_start + overlap_zone
-    draw.rectangle([0, stripe_y, width, stripe_y + stripe_height], fill=BRAND_COLORS['orange'])
-    draw.rectangle([0, stripe_y + stripe_height, width, stripe_y + stripe_height + 3],
-                   fill=BRAND_COLORS['orange_light'])
+    for i in range(stripe_height):
+        alpha_val = int(255 - (i / stripe_height) * 100)
+        color = (*BRAND_COLORS['orange'], alpha_val) if i < stripe_height // 2 else (
+        *BRAND_COLORS['orange_light'], alpha_val)
+        draw.line([(0, stripe_y + i), (width, stripe_y + i)], fill=color)
 
-    # Product name
-    font_product = get_default_font(68, bold=True)
+    # Corner accents for professional polish
+    corner_size = 60
+    corner_accent_tl = create_corner_accent(corner_size, BRAND_COLORS['orange'])
+    corner_accent_br = create_corner_accent(corner_size, BRAND_COLORS['orange']).rotate(180)
+    output.paste(corner_accent_tl, (15, 15), corner_accent_tl)
+    output.paste(corner_accent_br, (width - corner_size - 15, height - corner_size - 15), corner_accent_br)
+
+    # Product name with glow effect
+    font_product = get_default_font(70, bold=True)
     bbox = draw.textbbox((0, 0), product_name, font=font_product)
     product_width = bbox[2] - bbox[0]
     product_x = (width - product_width) // 2
-    product_y = text_start + overlap_zone + 50
+    product_y = text_start + overlap_zone + 60
 
-    # Glow effect behind text
-    draw.text((product_x + 3, product_y + 3), product_name, font=font_product, fill=(0, 0, 0, 100))
+    # Multi-layer glow for depth
+    for offset in [(4, 4), (3, 3), (2, 2)]:
+        draw.text((product_x + offset[0], product_y + offset[1]), product_name,
+                  font=font_product, fill=(0, 0, 0, 80))
     draw.text((product_x, product_y), product_name, font=font_product, fill=BRAND_COLORS['white'])
 
-    # Tagline
-    font_tagline = get_default_font(32, bold=False)
+    # Tagline with subtle background
+    font_tagline = get_default_font(34, bold=False)
     bbox_tag = draw.textbbox((0, 0), tagline, font=font_tagline)
     tagline_width = bbox_tag[2] - bbox_tag[0]
     tagline_x = (width - tagline_width) // 2
-    tagline_y = product_y + 80
-    draw.text((tagline_x, tagline_y), tagline, font=font_tagline, fill=BRAND_COLORS['orange_light'])
+    tagline_y = product_y + 90
 
-    # Badge - overlapping into image
-    badge_width = int(width * 0.75)
-    badge_height = 170
+    # Tagline background bar
+    tag_bg_padding = 15
+    draw.rounded_rectangle(
+        [tagline_x - tag_bg_padding, tagline_y - 8,
+         tagline_x + tagline_width + tag_bg_padding, tagline_y + 42],
+        radius=8,
+        fill=(*BRAND_COLORS['orange'], 100)
+    )
+    draw.text((tagline_x, tagline_y), tagline, font=font_tagline, fill=BRAND_COLORS['white'])
+
+    # Badge - overlapping design
+    badge_width = int(width * 0.78)
+    badge_height = 180
     badge = create_premium_badge(badge_width, badge_height, nectar_points, "Earn rewards")
     badge_x = (width - badge_width) // 2
     badge_y = text_start - badge_height // 2
@@ -372,23 +608,27 @@ def format_vertical_premium(
     badge_rgb = badge.convert('RGB')
     output.paste(badge_rgb, (badge_x, badge_y))
 
-    # Pollen Swarm branding - top right
-    branding_size = 100
-    branding = create_pollen_swarm_branding(branding_size, branding_size)
-    branding_rgb = branding.convert('RGB')
-    output.paste(branding_rgb, (width - branding_size - 30, 30), branding)
+    # Enhanced Pollen Swarm branding section - prominent placement
+    branding_bar_height = 85
+    branding_bar = create_enhanced_branding_bar(width, branding_bar_height)
+    branding_y = height - branding_bar_height - 85
+    output.paste(branding_bar, (0, branding_y), branding_bar)
 
-    # Flavor text
-    font_flavor = get_default_font(24, bold=False)
+    # Flavor text above branding
+    font_flavor = get_default_font(26, bold=False)
     bbox_flavor = draw.textbbox((0, 0), flavor_text, font=font_flavor)
     flavor_width = bbox_flavor[2] - bbox_flavor[0]
     flavor_x = (width - flavor_width) // 2
-    flavor_y = height - 65
-    draw.text((flavor_x, flavor_y), flavor_text, font=font_flavor, fill=BRAND_COLORS['orange_light'])
+    flavor_y = branding_y - 60
 
-    # "Pollen Swarm" text at bottom
-    font_brand = get_default_font(22, bold=True)
-    draw.text((35, height - 58), "✓ Pollen Swarm", font=font_brand, fill=BRAND_COLORS['white'])
+    # Flavor text with shadow
+    draw.text((flavor_x + 1, flavor_y + 1), flavor_text, font=font_flavor, fill=(0, 0, 0, 120))
+    draw.text((flavor_x, flavor_y), flavor_text, font=font_flavor, fill=BRAND_COLORS['white'])
+
+    # Additional small logo in top right for brand consistency
+    small_logo_size = 80
+    small_logo = create_pollen_swarm_branding(small_logo_size, small_logo_size, style='logo')
+    output.paste(small_logo, (width - small_logo_size - 25, 25), small_logo)
 
     return output
 
@@ -400,25 +640,38 @@ def format_square_premium(
         nectar_points: int = 10,
         flavor_text: str = "Trusted quality"
 ) -> Image.Image:
-    """Premium square format with cohesive design."""
+    """Premium square format with enhanced cohesive design and branding."""
     width, height = LAYOUT_SIZES['square']
     output = Image.new('RGB', (width, height), color=BRAND_COLORS['white'])
 
     # Image section
-    img_height = int(height * 0.68)
-    overlap_zone = int(height * 0.06)
+    img_height = int(height * 0.66)
+    overlap_zone = int(height * 0.08)
     text_start = img_height - overlap_zone
 
     processed_img = resize_and_crop(image, width, img_height)
     output.paste(processed_img, (0, 0))
 
-    # Fade overlay transition
-    fade = create_transparency_fade(width, overlap_zone * 2.5, direction='down')
-    fade_rgb = Image.new('RGB', (width, int(overlap_zone * 2.5)), color=BRAND_COLORS['orange'])
-    fade_with_trans = Image.new('RGBA', (width, int(overlap_zone * 2.5)))
-    fade_with_trans.paste(fade_rgb, (0, 0))
-    fade_with_trans.putalpha(fade.split()[3])
-    output.paste(fade_with_trans, (0, text_start), fade_with_trans)
+    # Extract dominant color for smart blending
+    dominant_color = extract_dominant_color(processed_img, 'bottom')
+
+    # Darkening overlay for better contrast
+    dark_overlay = Image.new('RGBA', (width, overlap_zone * 2), (0, 0, 0, 0))
+    dark_draw = ImageDraw.Draw(dark_overlay)
+    for y in range(overlap_zone * 2):
+        alpha = int((y / (overlap_zone * 2)) * 90)
+        dark_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
+    output.paste(dark_overlay, (0, img_height - overlap_zone * 2), dark_overlay)
+
+    # Smart overlay transition
+    smart_overlay = create_smart_overlay(
+        width,
+        overlap_zone * 3,
+        dominant_color,
+        BRAND_COLORS['orange'],
+        alpha=150
+    )
+    output.paste(smart_overlay, (0, text_start - overlap_zone), smart_overlay)
 
     # Background gradient
     gradient_height = height - text_start
@@ -430,40 +683,57 @@ def format_square_premium(
         vertical=True,
         power=1.1
     )
-    output.paste(gradient_bg, (0, text_start + int(overlap_zone * 1.5)))
+    output.paste(gradient_bg, (0, text_start + int(overlap_zone * 1.3)))
 
     draw = ImageDraw.Draw(output)
 
-    # Decorative stripe
-    stripe_y = text_start + int(overlap_zone * 1.5)
-    draw.rectangle([0, stripe_y, width, stripe_y + 10], fill=BRAND_COLORS['purple'])
-    draw.rectangle([0, stripe_y + 10, width, stripe_y + 12], fill=BRAND_COLORS['purple_light'])
+    # Decorative stripe with gradient effect
+    stripe_y = text_start + int(overlap_zone * 1.3)
+    for i in range(8):
+        alpha_val = int(255 - (i / 8) * 100)
+        color = (*BRAND_COLORS['purple'], alpha_val) if i < 4 else (*BRAND_COLORS['purple_light'], alpha_val)
+        draw.line([(0, stripe_y + i), (width, stripe_y + i)], fill=color)
 
-    # Product name
-    font_product = get_default_font(58, bold=True)
+    # Corner accents
+    corner_size = 55
+    corner_accent_tl = create_corner_accent(corner_size, BRAND_COLORS['purple'])
+    corner_accent_br = create_corner_accent(corner_size, BRAND_COLORS['purple']).rotate(180)
+    output.paste(corner_accent_tl, (12, 12), corner_accent_tl)
+    output.paste(corner_accent_br, (width - corner_size - 12, height - corner_size - 12), corner_accent_br)
+
+    # Product name with enhanced styling
+    font_product = get_default_font(62, bold=True)
     bbox = draw.textbbox((0, 0), product_name, font=font_product)
     product_width = bbox[2] - bbox[0]
     product_x = (width - product_width) // 2
-    product_y = stripe_y + 35
+    product_y = stripe_y + 45
 
-    draw.text((product_x + 2, product_y + 2), product_name, font=font_product, fill=(0, 0, 0, 80))
-    draw.text((product_x, product_y), product_name, font=font_product, fill=BRAND_COLORS['purple_dark'])
+    # Multi-layer shadow
+    for offset in [(3, 3), (2, 2), (1, 1)]:
+        draw.text((product_x + offset[0], product_y + offset[1]), product_name,
+                  font=font_product, fill=(0, 0, 0, 100))
+    draw.text((product_x, product_y), product_name, font=font_product, fill=BRAND_COLORS['white'])
 
-    # Badge
-    badge_width = int(width * 0.72)
-    badge_height = 140
+    # Enhanced Pollen Swarm branding - center bottom with prominence
+    branding_bar_height = 75
+    branding_bar = create_enhanced_branding_bar(width, branding_bar_height)
+    branding_y = height - branding_bar_height - 30
+    output.paste(branding_bar, (0, branding_y), branding_bar)
+
+    # Badge positioned above branding
+    badge_width = int(width * 0.75)
+    badge_height = 150
     badge = create_premium_badge(badge_width, badge_height, nectar_points, "Earn rewards")
     badge_x = (width - badge_width) // 2
-    badge_y = height - badge_height - 30
+    badge_y = branding_y - badge_height - 20
 
     badge_rgb = badge.convert('RGB')
     output.paste(badge_rgb, (badge_x, badge_y))
 
-    # Pollen Swarm branding - corner
-    branding_size = 85
-    branding = create_pollen_swarm_branding(branding_size, branding_size)
-    branding_rgb = branding.convert('RGB')
-    output.paste(branding_rgb, (width - branding_size - 25, 25), branding)
+    # Small logo in corner
+    small_logo_size = 75
+    small_logo = create_pollen_swarm_branding(small_logo_size, small_logo_size, style='logo')
+    output.paste(small_logo, (width - small_logo_size - 20, 20), small_logo)
 
     return output
 
@@ -476,17 +746,20 @@ def format_horizontal_premium(
         flavor_text: str = "Trusted quality",
         image_position: str = 'left'
 ) -> Image.Image:
-    """Premium horizontal layout with cohesive composition."""
+    """Premium horizontal layout with enhanced cohesive composition and branding."""
     width, height = LAYOUT_SIZES['horizontal']
     output = Image.new('RGB', (width, height), color=BRAND_COLORS['white'])
 
-    img_width = int(width * 0.55)
+    img_width = int(width * 0.54)
     panel_width = width - img_width
 
     # Process image
     processed_img = resize_and_crop(image, img_width, height)
 
-    # Create gradient panel
+    # Extract dominant color for smart overlay
+    dominant_color = extract_dominant_color(processed_img, 'right' if image_position == 'left' else 'left')
+
+    # Create enhanced gradient panel
     gradient_panel = create_gradient(
         panel_width,
         height,
@@ -501,76 +774,122 @@ def format_horizontal_premium(
         output.paste(processed_img, (0, 0))
         output.paste(gradient_panel, (img_width, 0))
 
-        # Fade transition between image and panel
-        fade_width = 80
-        fade = create_transparency_fade(fade_width, height, direction='up')
-        fade_rgb = Image.new('RGB', (fade_width, height), color=BRAND_COLORS['purple'])
-        fade_with_trans = Image.new('RGBA', (fade_width, height))
-        fade_with_trans.paste(fade_rgb, (0, 0))
-        fade_with_trans.putalpha(fade.split()[3])
-        output.paste(fade_with_trans, (img_width - fade_width, 0), fade_with_trans)
+        # Enhanced fade transition with smart color matching
+        fade_width = 120
+        smart_fade = create_smart_overlay(
+            fade_width,
+            height,
+            dominant_color,
+            BRAND_COLORS['purple'],
+            alpha=180
+        )
+        output.paste(smart_fade, (img_width - fade_width + 20, 0), smart_fade)
 
-        panel_x = img_width + 50
+        panel_x = img_width + 60
+        accent_x = img_width
     else:
         output.paste(gradient_panel, (0, 0))
         output.paste(processed_img, (panel_width, 0))
 
-        fade_width = 80
-        fade = create_transparency_fade(fade_width, height, direction='down')
-        fade_rgb = Image.new('RGB', (fade_width, height), color=BRAND_COLORS['purple'])
-        fade_with_trans = Image.new('RGBA', (fade_width, height))
-        fade_with_trans.paste(fade_rgb, (0, 0))
-        fade_with_trans.putalpha(fade.split()[3])
-        output.paste(fade_with_trans, (panel_width, 0), fade_with_trans)
+        fade_width = 120
+        smart_fade = create_smart_overlay(
+            fade_width,
+            height,
+            dominant_color,
+            BRAND_COLORS['purple'],
+            alpha=180
+        )
+        output.paste(smart_fade, (panel_width - 20, 0), smart_fade)
 
-        panel_x = 50
+        panel_x = 60
+        accent_x = panel_width - 6
 
     draw = ImageDraw.Draw(output)
 
-    # Vertical accent divider
+    # Enhanced vertical accent divider with gradient
+    divider_width = 8
+    for i in range(divider_width):
+        if image_position == 'left':
+            alpha_val = int(255 - (i / divider_width) * 100)
+            color = (*BRAND_COLORS['orange'], alpha_val) if i < divider_width // 2 else (
+            *BRAND_COLORS['orange_light'], alpha_val)
+            draw.line([(accent_x + i, 0), (accent_x + i, height)], fill=color)
+        else:
+            alpha_val = int(255 - (i / divider_width) * 100)
+            color = (*BRAND_COLORS['orange'], alpha_val) if i < divider_width // 2 else (
+            *BRAND_COLORS['orange_light'], alpha_val)
+            draw.line([(accent_x - i, 0), (accent_x - i, height)], fill=color)
+
+    # Corner accents
+    corner_size = 50
+    corner_accent_tl = create_corner_accent(corner_size, BRAND_COLORS['orange'])
+    corner_accent_br = create_corner_accent(corner_size, BRAND_COLORS['orange']).rotate(180)
+
     if image_position == 'left':
-        draw.rectangle([img_width, 0, img_width + 6, height], fill=BRAND_COLORS['orange'])
-        draw.rectangle([img_width + 6, 0, img_width + 8, height], fill=BRAND_COLORS['orange_light'])
+        output.paste(corner_accent_br, (width - corner_size - 12, height - corner_size - 12), corner_accent_br)
     else:
-        draw.rectangle([panel_width - 6, 0, panel_width, height], fill=BRAND_COLORS['orange'])
-        draw.rectangle([panel_width - 8, 0, panel_width - 6, height], fill=BRAND_COLORS['orange_light'])
+        output.paste(corner_accent_tl, (12, 12), corner_accent_tl)
 
     # Typography
-    font_product = get_default_font(54, bold=True)
-    font_tagline = get_default_font(28, bold=False)
-    font_flavor = get_default_font(22, bold=False)
+    font_product = get_default_font(58, bold=True)
+    font_tagline = get_default_font(30, bold=False)
+    font_flavor = get_default_font(24, bold=False)
 
-    # Product name
-    product_y = int(height * 0.15)
+    # Product name with enhanced styling
+    product_y = int(height * 0.12)
     bbox = draw.textbbox((0, 0), product_name, font=font_product)
-    draw.text((panel_x + 2, product_y + 2), product_name, font=font_product, fill=(0, 0, 0, 70))
+
+    # Multi-layer shadow for depth
+    for offset in [(3, 3), (2, 2)]:
+        draw.text((panel_x + offset[0], product_y + offset[1]), product_name,
+                  font=font_product, fill=(0, 0, 0, 90))
     draw.text((panel_x, product_y), product_name, font=font_product, fill=BRAND_COLORS['white'])
 
-    # Tagline
-    tagline_y = product_y + 70
-    draw.text((panel_x, tagline_y), tagline, font=font_tagline, fill=BRAND_COLORS['orange_light'])
+    # Tagline with background
+    tagline_y = product_y + 75
+    bbox_tag = draw.textbbox((0, 0), tagline, font=font_tagline)
+    tagline_width = bbox_tag[2] - bbox_tag[0]
+
+    # Subtle background bar for tagline
+    tag_padding = 12
+    draw.rounded_rectangle(
+        [panel_x - tag_padding, tagline_y - 6,
+         panel_x + tagline_width + tag_padding, tagline_y + 36],
+        radius=6,
+        fill=(*BRAND_COLORS['orange'], 80)
+    )
+    draw.text((panel_x, tagline_y), tagline, font=font_tagline, fill=BRAND_COLORS['white'])
 
     # Badge
-    badge_width = int(panel_width * 0.8)
-    badge_height = 145
+    badge_width = int(panel_width * 0.82)
+    badge_height = 155
     badge = create_premium_badge(badge_width, badge_height, nectar_points, "Earn points")
-    badge_x = panel_x + (panel_width - badge_width - 70) // 2
-    badge_y = int(height * 0.48)
+    badge_x = panel_x + (panel_width - badge_width - 80) // 2
+    badge_y = int(height * 0.45)
     badge_rgb = badge.convert('RGB')
     output.paste(badge_rgb, (badge_x, badge_y))
 
-    # Flavor text
-    flavor_y = height - 55
-    draw.text((panel_x, flavor_y), flavor_text, font=font_flavor, fill=BRAND_COLORS['white'])
+    # Prominent Pollen Swarm branding section
+    branding_bar_height = 70
+    branding_bar_width = panel_width - 100
+    branding_bar = create_enhanced_branding_bar(branding_bar_width, branding_bar_height)
+    branding_x = panel_x + 20
+    branding_y = height - branding_bar_height - 45
+    output.paste(branding_bar, (branding_x, branding_y), branding_bar)
 
-    # Pollen Swarm branding
-    branding_size = 95
-    branding = create_pollen_swarm_branding(branding_size, branding_size)
-    branding_rgb = branding.convert('RGB')
+    # Flavor text above branding
+    flavor_y = branding_y - 50
+    bbox_flavor = draw.textbbox((0, 0), flavor_text, font=font_flavor)
+    draw.text((panel_x + 1, flavor_y + 1), flavor_text, font=font_flavor, fill=(0, 0, 0, 100))
+    draw.text((panel_x, flavor_y), flavor_text, font=font_flavor, fill=BRAND_COLORS['orange_light'])
+
+    # Small logo on image side
+    small_logo_size = 85
+    small_logo = create_pollen_swarm_branding(small_logo_size, small_logo_size, style='logo')
     if image_position == 'left':
-        output.paste(branding_rgb, (panel_x + panel_width - branding_size - 20, height - branding_size - 20), branding)
+        output.paste(small_logo, (25, height - small_logo_size - 25), small_logo)
     else:
-        output.paste(branding_rgb, (20, height - branding_size - 20), branding)
+        output.paste(small_logo, (width - small_logo_size - 25, 25), small_logo)
 
     return output
 
