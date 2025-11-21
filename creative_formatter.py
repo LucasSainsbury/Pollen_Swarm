@@ -143,6 +143,10 @@ def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> T
         box = (0, 3*h//4, w, h)
     elif sample_area == 'top':
         box = (0, 0, w, h//4)
+    elif sample_area == 'right':
+        box = (3*w//4, 0, w, h)
+    elif sample_area == 'left':
+        box = (0, 0, w//4, h)
     else:
         box = (0, 0, w, h)
     
@@ -151,8 +155,14 @@ def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> T
     
     # Get average color - safely handle all pixel data
     pixels = list(region.getdata())
-    if not pixels or len(pixels[0]) < 3:
-        # Fallback to neutral color if something goes wrong
+    if not pixels:
+        # Fallback to neutral color if no pixels
+        return (128, 128, 128)
+    
+    # Check if pixels have RGB channels
+    first_pixel = pixels[0]
+    if not isinstance(first_pixel, tuple) or len(first_pixel) < 3:
+        # Fallback to neutral color for non-RGB data
         return (128, 128, 128)
     
     r_avg = sum(p[0] for p in pixels) // len(pixels)
