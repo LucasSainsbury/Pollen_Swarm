@@ -169,7 +169,8 @@ def apply_vignette(
 def add_noise_overlay(
     image: Image.Image,
     intensity: int = 10,
-    grain_size: int = 1
+    grain_size: int = 1,
+    blend_ratio: float = 0.1
 ) -> Image.Image:
     """
     Add subtle noise texture overlay for film-like quality.
@@ -178,10 +179,13 @@ def add_noise_overlay(
         image: Input PIL Image
         intensity: Noise intensity (0-255)
         grain_size: Size of noise grains (1 = fine, higher = coarser)
+        blend_ratio: Noise blend ratio (0.0-1.0, default 0.1 for subtle effect)
         
     Returns:
         Image with noise overlay
     """
+    FINE_GRAIN_SIZE = 1  # Threshold for fine grain rendering
+    
     width, height = image.size
     noise = Image.new('RGB', (width // grain_size, height // grain_size))
     pixels = noise.load()
@@ -194,10 +198,11 @@ def add_noise_overlay(
             pixels[x, y] = (gray, gray, gray)
     
     # Scale up noise with smoother resampling for better quality
-    # Use NEAREST for grain_size=1 (fine grain), BILINEAR for larger grains
-    resample_method = Image.Resampling.NEAREST if grain_size == 1 else Image.Resampling.BILINEAR
+    # Use NEAREST for fine grain, BILINEAR for larger grains
+    resample_method = (Image.Resampling.NEAREST if grain_size == FINE_GRAIN_SIZE 
+                      else Image.Resampling.BILINEAR)
     noise = noise.resize((width, height), resample_method)
-    result = Image.blend(image, noise, 0.1)
+    result = Image.blend(image, noise, blend_ratio)
     
     return result
 
