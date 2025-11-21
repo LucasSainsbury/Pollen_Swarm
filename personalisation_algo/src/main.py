@@ -15,6 +15,12 @@ from src.scoring_engine import ProductScoringEngine
 from src.constraint_filter import ConstraintFilter
 from src.selector import ProductSelector
 
+# FastAPI imports for API
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import uvicorn
+
 
 class RecommendationEngine:
     """
@@ -223,13 +229,9 @@ class RecommendationEngine:
             )
 
 
-def main():
-    """Example usage of the recommendation engine."""
+def cli_main(engine: RecommendationEngine):
+    """CLI helper for manual runs."""
     import sys
-    
-    # Initialize engine
-    engine = RecommendationEngine('config/config.yaml')
-    
     # Check if data paths provided
     if len(sys.argv) < 4:
         print("Usage: python -m src.main <products.csv> <transactions.csv> <clickstream.csv> [customer_id]")
@@ -248,7 +250,6 @@ def main():
     if len(sys.argv) >= 5:
         customer_id = sys.argv[4]
     else:
-        # Use first customer in transactions
         customer_id = transactions['customer_id'].iloc[0]
     
     # Generate recommendation
@@ -277,5 +278,56 @@ def main():
         print(f"No recommendation could be generated for customer {customer_id}")
 
 
+# ----- FastAPI wiring -----
+
+class RecommendRequest(BaseModel):
+    customer_id: str
+    products_path: str
+    transactions_path: str
+    clickstream_path: str
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(title="Recommendation Engine API", version="1.0.0")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
+    engine = RecommendationEngine('config/config.yaml')
+    
+    @app.post("/recommend")
+    def recommend(payload: RecommendRequest):
+        try:
+            products, transactions, clickstream = engine.load_data(
+                products_path=payload.products_path,
+                transactions_path=payload.transactions_path,
+                clickstream_path=payload.clickstream_path
+            )
+            rec = engine.recommend_product(
+                customer_id=payload.customer_id,
+                products=products,
+                transactions=transactions,
+                clickstream=clickstream
+            )
+            if not rec:
+                raise HTTPException(status_code=404, detail="No recommendation available")
+            return rec
+        except FileNotFoundError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+    
+    return app
+
+
 if __name__ == '__main__':
-    main()
+    import sys
+    if len(sys.argv) > 1:
+        cli_main(RecommendationEngine('config/config.yaml'))
+    else:
+        app = create_app()
+        uvicorn.run(app, host="0.0.0.0", port=8000)
