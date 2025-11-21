@@ -33,7 +33,6 @@ class ProductRequest(BaseModel):
     seed: Optional[int] = 10
 
 
-
 @app.post("/generate-image")
 async def generate_product_image(request: ProductRequest):
     """
