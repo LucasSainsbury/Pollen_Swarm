@@ -1,7 +1,6 @@
 from huggingface_hub import HfApi
 import os
 
-# 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
 
 # Get token from environment (NEVER hardcode it)
 HF_TOKEN = os.getenv("HF_TOKEN")
