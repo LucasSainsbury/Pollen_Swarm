@@ -1,160 +1,288 @@
 #!/usr/bin/env python3
 """
-Complete Workflow Demo
-======================
+Complete Professional Workflow Demo
+====================================
 
-This script demonstrates the complete end-to-end workflow:
-1. Generate themed prompts for a product
-2. (Simulated) Generate images for each theme
-3. Format images into marketing layouts
-
-For demonstration, we'll create sample images instead of calling the API.
+Enhanced end-to-end workflow demonstrating:
+1. Direct function imports from generate_product_images.py
+2. Professional marketing layout formatting with real generated images
+3. Multiple layout variations with custom copy
+4. Direct API integration for AI image generation
 """
 
-import os
 import sys
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
 
-# Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from prompt_generator import generate_prompts, get_theme_description
+from generate_product_images import generate_product_images
 from creative_formatter import format_creative
 
-def create_sample_image(theme_name: str, product_name: str, width: int = 800, height: int = 600) -> Image.Image:
-    """Create a sample image for demonstration."""
-    # Create a colorful sample image
-    colors = {
-        'christmas_festive': '#FF0000',
-        'studio_product': '#FFFFFF',
-        'supermarket_shelf': '#FFD700',
-        'back_to_school': '#4169E1',
-        'cooked_prepared': '#FF8C00',
-        'summer_outdoor': '#87CEEB',
-        'healthy_lifestyle': '#32CD32',
-        'family_home': '#DEB887',
-        'premium_luxury': '#9370DB',
-        'easter_spring': '#FFB6C1',
-    }
-    
-    # Get base color for theme
-    base_color = colors.get(theme_name, '#808080')
-    
-    # Create image with gradient
-    img = Image.new('RGB', (width, height), color=base_color)
-    draw = ImageDraw.Draw(img)
-    
-    # Add theme and product text
-    try:
-        font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
-        font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
-    except:
-        font_large = ImageFont.load_default()
-        font_small = ImageFont.load_default()
-    
-    # Draw centered text
-    theme_desc = get_theme_description(theme_name)
-    
-    # Calculate text bounding boxes
-    bbox1 = draw.textbbox((0, 0), theme_desc, font=font_large)
-    bbox2 = draw.textbbox((0, 0), product_name, font=font_small)
-    
-    text1_width = bbox1[2] - bbox1[0]
-    text2_width = bbox2[2] - bbox2[0]
-    
-    # Draw theme name
-    x1 = (width - text1_width) // 2
-    y1 = height // 2 - 40
-    draw.text((x1, y1), theme_desc, fill='white', font=font_large)
-    
-    # Draw product name
-    x2 = (width - text2_width) // 2
-    y2 = height // 2 + 20
-    draw.text((x2, y2), product_name, fill='white', font=font_small)
-    
-    return img
+# Demo product configurations
+DEMO_PRODUCTS = [
+    {
+        'product': 'organic honey (250g)',
+        'category': 'Condiments',
+        'themes': ['christmas_festive', 'studio_product', 'supermarket_shelf'],
+        'name': 'Organic Honey',
+        'tagline': 'Pure Natural Sweetness',
+        'flavor_vertical': 'Ethically sourced from local beekeepers',
+        'flavor_square': 'Nature\'s golden treasure',
+        'flavor_horizontal': '100% pure, never heated',
+        'points': 25,
+    },
+]
+
+'''
+    {
+        'product': 'premium butter no salt (120g)',
+        'category': 'Dairy',
+        'themes': ['studio_product', 'family_home', 'healthy_lifestyle'],
+        'name': 'Premium Butter',
+        'tagline': 'Crafted Perfection',
+        'flavor_vertical': 'Rich, creamy, and sustainably made',
+        'flavor_square': 'Taste the difference',
+        'flavor_horizontal': 'From grass-fed dairy',
+        'points': 20,
+    },
+    '''
+
+# API Configuration
+HF_TOKEN = "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"
+SEED = 1
+OUTPUT_BASE = Path("./demo_workflow_output")
 
 
-def demo_workflow():
-    """Demonstrate the complete workflow."""
-    print("="*80)
-    print("Pollen Swarm - Complete Workflow Demo")
-    print("="*80)
-    print()
-    
-    # Step 1: Define product
-    product_name = "organic honey (250g)"
-    category = "Condiments"
-    
-    print(f"Product: {product_name}")
-    print(f"Category: {category}")
-    print()
-    
-    # Step 2: Generate prompts
-    print("Step 1: Generating themed prompts...")
-    prompts = generate_prompts(product_name, category)
-    print(f"✓ Generated {len(prompts)} themed prompts")
-    print()
-    
-    # Show first 3 prompts as examples
-    print("Sample prompts:")
-    for i, (theme, prompt) in enumerate(list(prompts.items())[:3], 1):
-        desc = get_theme_description(theme)
-        print(f"\n{i}. {desc}")
-        print(f"   {prompt[:100]}...")
-    print()
-    
-    # Step 3: Create sample images (simulating API generation)
-    print("Step 2: Creating sample images (simulating API generation)...")
-    output_dir = Path("/tmp/demo_workflow")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    sample_images = []
-    for i, (theme_name, prompt) in enumerate(list(prompts.items())[:3], 1):
-        img = create_sample_image(theme_name, product_name)
-        img_path = output_dir / f"honey_{theme_name}.jpg"
-        img.save(img_path, quality=95)
-        sample_images.append((theme_name, img_path))
-        print(f"  ✓ Created: {img_path.name}")
-    print()
-    
-    # Step 4: Format images into marketing layouts
-    print("Step 3: Formatting images into marketing layouts...")
-    layouts = ['vertical', 'square', 'horizontal']
-    
-    for theme_name, img_path in sample_images[:1]:  # Just format the first one
-        print(f"\n  Processing: {theme_name}")
-        for layout in layouts:
+def format_generated_images(
+        images_dir: Path,
+        product_data: dict,
+        output_dir: Path
+) -> list:
+    """
+    Format all generated images into professional marketing layouts.
+
+    Args:
+        images_dir: Directory containing generated images
+        product_data: Product metadata (name, tagline, flavor texts, etc.)
+        output_dir: Output directory for formatted images
+
+    Returns:
+        List of formatted image paths
+    """
+    formatted_images = []
+
+    # Find all generated JPG images
+    generated_images = list(images_dir.glob("*.jpg"))
+
+    if not generated_images:
+        print(f"  ⚠️  No generated images found in {images_dir}")
+        return formatted_images
+
+    print(f"  Found {len(generated_images)} generated images")
+    print(f"\n  Formatting into professional layouts:\n")
+
+    # Use first image for multi-format demonstration
+    base_image = generated_images[0]
+    theme_name = base_image.stem.split('_', 1)[1] if '_' in base_image.stem else 'base'
+
+    # Layout configurations
+    layouts_config = [
+        {
+            'layout': 'vertical',
+            'flavor': product_data['flavor_vertical'],
+            'description': 'Portrait (9:16)',
+        },
+        {
+            'layout': 'square',
+            'flavor': product_data['flavor_square'],
+            'description': 'Square (1:1)',
+        },
+        {
+            'layout': 'horizontal',
+            'flavor': product_data['flavor_horizontal'],
+            'description': 'Landscape (16:9)',
+        }
+    ]
+
+    print(f"  Base image: {base_image.stem}\n")
+
+    for config in layouts_config:
+        try:
             output_path, metadata_path = format_creative(
-                input_image_path=str(img_path),
-                layout=layout,
-                nectar_points=15,
-                image_position='left'
+                input_image_path=str(base_image),
+                layout=config['layout'],
+                product_name=product_data['name'],
+                tagline=product_data['tagline'],
+                nectar_points=product_data['points'],
+                flavor_text=config['flavor'],
+                output_path=str(output_dir / f"{base_image.stem}_{config['layout']}_formatted.png"),
+                image_position='left' if config['layout'] == 'horizontal' else 'center'
             )
-            print(f"    ✓ {layout.capitalize()} layout: {Path(output_path).name}")
-    
-    print()
-    print("="*80)
-    print("Demo Complete!")
-    print("="*80)
-    print(f"\nOutput directory: {output_dir}")
-    print("\nFiles created:")
-    for file in sorted(output_dir.glob("*")):
-        print(f"  - {file.name}")
-    print()
-    print("Next steps:")
-    print("  1. Review the generated files in:", output_dir)
-    print("  2. Try with real API: python generate_product_images.py --product '...' --category '...'")
-    print("  3. Format your own images: python creative_formatter.py -i image.jpg -l vertical")
-    print()
+
+            formatted_images.append(output_path)
+            print(f"    ✓ {config['layout'].upper():12} → {Path(output_path).name}")
+
+        except Exception as e:
+            print(f"    ❌ {config['layout'].upper():12} → Failed: {e}")
+
+    return formatted_images
+
+
+def demo_complete_workflow():
+    """Run complete professional workflow with real AI image generation."""
+    print("\n" + "=" * 100)
+    print("🎨 POLLEN SWARM - PROFESSIONAL WORKFLOW WITH AI GENERATION 🎨".center(100))
+    print("=" * 100 + "\n")
+
+    output_base = OUTPUT_BASE
+    output_base.mkdir(parents=True, exist_ok=True)
+
+    all_results = []
+
+    # Process each product
+    for idx, product_data in enumerate(DEMO_PRODUCTS, 1):
+        print(f"\n{'─' * 100}")
+        print(f"📦 PRODUCT {idx}/{len(DEMO_PRODUCTS)}: {product_data['name'].upper()}")
+        print(f"{'─' * 100}\n")
+
+        product = product_data['product']
+        category = product_data['category']
+        themes = product_data['themes']
+
+        # Create product-specific directory
+        product_key = product.split('(')[0].strip().lower().replace(' ', '_')
+        product_output = output_base / product_key
+        product_output.mkdir(exist_ok=True)
+
+        generation_output = product_output / "generated"
+        generation_output.mkdir(exist_ok=True)
+
+        # Step 1 & 2: Generate images using direct function import
+        print(f"Step 1️⃣  Generating themed product images\n")
+        print(f"   Product: {product}")
+        print(f"   Category: {category}")
+        print(f"   Themes: {', '.join(themes)}")
+        print(f"   Seed: {SEED}\n")
+
+        try:
+            results = generate_product_images(
+                product_name=product,
+                category=category,
+                output_dir=str(generation_output),
+                themes=themes,
+                seed=SEED,
+                aspect_ratio="16:9",
+                hf_token=HF_TOKEN,
+                brightness=1.1,
+                contrast=1.15,
+                saturation=1.2
+            )
+
+            successful = sum(1 for r in results.values() if r['status'] == 'success')
+            failed = sum(1 for r in results.values() if r['status'] == 'failed')
+
+            print(f"\n   ✓ Generation complete")
+            print(f"     • Successful: {successful}")
+            print(f"     • Failed: {failed}\n")
+
+        except Exception as e:
+            print(f"   ❌ Image generation failed: {e}")
+            print(f"   ⏭️  Skipping to next product\n")
+            continue
+
+        # Step 2: Format into professional layouts
+        print(f"Step 2️⃣  Formatting into professional marketing layouts\n")
+
+        formatted_output = product_output / "formatted"
+        formatted_output.mkdir(exist_ok=True)
+
+        formatted_images = format_generated_images(
+            images_dir=generation_output,
+            product_data=product_data,
+            output_dir=formatted_output
+        )
+
+        # Step 3: Summary
+        print(f"\n  📊 Results for {product_data['name']}:")
+        print(f"     • Generated images: {generation_output}")
+        print(f"     • Formatted layouts: {formatted_output}")
+        print(f"     • Total formatted outputs: {len(formatted_images)}")
+
+        all_results.append({
+            'product': product_data['name'],
+            'category': category,
+            'generation_dir': str(generation_output),
+            'formatted_dir': str(formatted_output),
+            'formatted_count': len(formatted_images),
+            'generated_count': successful,
+        })
+
+    # Final Summary
+    print(f"\n{'=' * 100}")
+    print("✅ WORKFLOW COMPLETE - ALL PRODUCTS PROCESSED".center(100))
+    print(f"{'=' * 100}\n")
+
+    print(f"📁 Main Output: {output_base}\n")
+
+    print("📊 Summary of Generated Outputs:")
+    total_generated = 0
+    total_formatted = 0
+
+    for result in all_results:
+        print(f"\n   {result['product']}")
+        print(f"   ├─ Category: {result['category']}")
+        print(f"   ├─ Generated: {result['generated_count']} images")
+        print(f"   ├─ Formatted: {result['formatted_count']} layouts")
+        print(f"   └─ Path: {Path(result['formatted_dir']).parent.name}/")
+        total_generated += result['generated_count']
+        total_formatted += result['formatted_count']
+
+    print(f"\n   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print(f"   TOTALS: {total_generated} images → {total_formatted} layouts")
+
+    print("\n📋 Workflow Pipeline:")
+    print("   1. ✓ Prompt generation (themed creative briefs)")
+    print("   2. ✓ AI image generation (HuggingFace API)")
+    print("   3. ✓ Professional post-processing (brightness, contrast, saturation)")
+    print("   4. ✓ Multi-format layout generation (3 variants per product)")
+    print("   5. ✓ Metadata preservation (JSON tracking)")
+
+    print("\n🎨 Professional Design Features:")
+    print("   ✓ Dynamic gradient overlays")
+    print("   ✓ Sophisticated typography hierarchy")
+    print("   ✓ Overlapping image/panel composition")
+    print("   ✓ Context-aware flavor text")
+    print("   ✓ Premium nectar points badges")
+    print("   ✓ Multi-format responsive layouts (9:16, 1:1, 16:9)")
+    print("   ✓ Brand-consistent purple & orange color scheme")
+
+    print("\n💡 Key Parameters Used:")
+    print(f"   • HF Token: {'*' * len(HF_TOKEN[:-10]) + HF_TOKEN[-10:]}")
+    print(f"   • Seed: {SEED}")
+    print(f"   • Aspect Ratio: 16:9")
+    print(f"   • Brightness: 1.1")
+    print(f"   • Contrast: 1.15")
+    print(f"   • Saturation: 1.2")
+
+    print("\n🚀 Next Steps:")
+    print("   1. Review generated files:")
+    print(f"      open {output_base}")
+    print("   2. Customize products in DEMO_PRODUCTS dict")
+    print("   3. Adjust generation parameters as needed")
+    print("   4. Integrate into your batch processing pipeline")
+
+    print("\n" + "=" * 100 + "\n")
 
 
 if __name__ == "__main__":
     try:
-        demo_workflow()
+        demo_complete_workflow()
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Workflow interrupted by user")
+        sys.exit(0)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"\n❌ Workflow error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

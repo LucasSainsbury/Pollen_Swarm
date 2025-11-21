@@ -21,6 +21,9 @@ Usage:
         --category "Condiments" \
         --themes christmas_festive studio_product \
         --output ./output/honey/
+
+
+    python generate_product_images.py --product "organic honey (250g)" --category "Condiments" --themes christmas_festive --hf-token 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 --seed 42 --output ./output/honey/
     
     # Use custom settings
     python generate_product_images.py \

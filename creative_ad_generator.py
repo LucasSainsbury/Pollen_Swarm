@@ -298,7 +298,8 @@ class CreativeImagePipeline:
             # Generate image using the new client
             image = self.client.text_to_image(
                 prompt,
-                model=self.model_name
+                model=self.model_name,
+                seed=seed
             )
 
             logger.info("✓ API generation successful")
