@@ -48,7 +48,7 @@ DEMO_PRODUCTS = [
     '''
 
 # API Configuration
-IGNORE = "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"
+HF_TOKEN = "test"
 SEED = 1
 OUTPUT_BASE = Path("./demo_workflow_output")
 
@@ -172,7 +172,7 @@ def demo_complete_workflow():
                 themes=themes,
                 seed=SEED,
                 aspect_ratio="16:9",
-                hf_token=IGNORE,
+                hf_token=HF_TOKEN,
                 brightness=1.1,
                 contrast=1.15,
                 saturation=1.2
@@ -257,7 +257,7 @@ def demo_complete_workflow():
     print("   ✓ Brand-consistent purple & orange color scheme")
 
     print("\n💡 Key Parameters Used:")
-    print(f"   • HF Token: {'*' * len(IGNORE[:-10]) + IGNORE[-10:]}")
+    print(f"   • HF Token: {'*' * len(HF_TOKEN[:-10]) + HF_TOKEN[-10:]}")
     print(f"   • Seed: {SEED}")
     print(f"   • Aspect Ratio: 16:9")
     print(f"   • Brightness: 1.1")
