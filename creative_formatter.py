@@ -131,6 +131,10 @@ def create_gradient(
 
 def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> Tuple[int, int, int]:
     """Extract dominant color from image for smart gradient matching."""
+    # Ensure image is in RGB mode
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
     # Sample a region of the image
     w, h = image.size
     if sample_area == 'center':
@@ -145,8 +149,12 @@ def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> T
     region = image.crop(box)
     region = region.resize((50, 50), Image.Resampling.LANCZOS)
     
-    # Get average color
+    # Get average color - safely handle all pixel data
     pixels = list(region.getdata())
+    if not pixels or len(pixels[0]) < 3:
+        # Fallback to neutral color if something goes wrong
+        return (128, 128, 128)
+    
     r_avg = sum(p[0] for p in pixels) // len(pixels)
     g_avg = sum(p[1] for p in pixels) // len(pixels)
     b_avg = sum(p[2] for p in pixels) // len(pixels)
@@ -167,8 +175,11 @@ def create_smart_overlay(
         brand_color: Tuple[int, int, int],
         alpha: int = 180
 ) -> Image.Image:
-    """Create a smart overlay that blends image colors with brand colors."""
+    """Create a smart overlay that blends image colors with brand colors efficiently."""
     overlay = Image.new('RGBA', (width, height))
+    
+    # Use ImageDraw for more efficient rendering
+    draw = ImageDraw.Draw(overlay)
     
     # Create a gradient from extracted color to brand color
     for y in range(height):
@@ -180,8 +191,8 @@ def create_smart_overlay(
         # Vary alpha for smoother transitions
         line_alpha = int(alpha * (0.3 + 0.7 * ratio))
         
-        for x in range(width):
-            overlay.putpixel((x, y), (r, g, b, line_alpha))
+        # Draw entire line at once instead of pixel by pixel
+        draw.line([(0, y), (width, y)], fill=(r, g, b, line_alpha))
     
     return overlay
 
@@ -445,20 +456,19 @@ def create_pollen_swarm_branding(width: int, height: int, style: str = 'logo') -
 
 
 def create_enhanced_branding_bar(width: int, height: int) -> Image.Image:
-    """Create a prominent branded bar with Pollen Swarm branding."""
+    """Create a prominent branded bar with Pollen Swarm branding efficiently."""
     bar = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(bar)
     
-    # Gradient background
+    # Gradient background using line drawing for better performance
     for y in range(height):
         ratio = y / height
         r = int(BRAND_COLORS['purple'][0] * (1 - ratio * 0.3))
         g = int(BRAND_COLORS['purple'][1] * (1 - ratio * 0.3))
         b = int(BRAND_COLORS['purple'][2] * (1 - ratio * 0.3))
         
-        for x in range(width):
-            bar.putpixel((x, y), (r, g, b, 240))
-    
-    draw = ImageDraw.Draw(bar)
+        # Draw entire line at once
+        draw.line([(0, y), (width, y)], fill=(r, g, b, 240))
     
     # Decorative stripe at top
     draw.rectangle([0, 0, width, 4], fill=BRAND_COLORS['orange'])
@@ -503,10 +513,10 @@ def format_vertical_premium(
 
     # Apply subtle darkening overlay on bottom of image for better text contrast
     dark_overlay = Image.new('RGBA', (width, overlap_zone * 2), (0, 0, 0, 0))
+    dark_draw = ImageDraw.Draw(dark_overlay)
     for y in range(overlap_zone * 2):
         alpha = int((y / (overlap_zone * 2)) * 100)
-        for x in range(width):
-            dark_overlay.putpixel((x, y), (0, 0, 0, alpha))
+        dark_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
     output.paste(dark_overlay, (0, img_height - overlap_zone * 2), dark_overlay)
 
     # Smart color-matched overlay for smooth transition
@@ -637,10 +647,10 @@ def format_square_premium(
 
     # Darkening overlay for better contrast
     dark_overlay = Image.new('RGBA', (width, overlap_zone * 2), (0, 0, 0, 0))
+    dark_draw = ImageDraw.Draw(dark_overlay)
     for y in range(overlap_zone * 2):
         alpha = int((y / (overlap_zone * 2)) * 90)
-        for x in range(width):
-            dark_overlay.putpixel((x, y), (0, 0, 0, alpha))
+        dark_draw.line([(0, y), (width, y)], fill=(0, 0, 0, alpha))
     output.paste(dark_overlay, (0, img_height - overlap_zone * 2), dark_overlay)
 
     # Smart overlay transition
