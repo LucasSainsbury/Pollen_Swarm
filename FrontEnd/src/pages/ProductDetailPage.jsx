@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { fetchProductById, fetchRecommendation } from "../services/api";
+import {
+  fetchProductById,
+  fetchRecommendation,
+  fetchGeneratedImage
+} from "../services/api";
 import { useInteraction } from "../context/InteractionContext";
 import AdPanel from "../components/AdPanel";
 import InteractionFeed from "../components/InteractionFeed";
@@ -13,6 +17,9 @@ export default function ProductDetailPage() {
   const [reco, setReco] = useState(null);
   const [recoError, setRecoError] = useState("");
   const [recoLoading, setRecoLoading] = useState(false);
+  const [creativeSrc, setCreativeSrc] = useState("");
+  const [creativeError, setCreativeError] = useState("");
+  const [creativeLoading, setCreativeLoading] = useState(false);
   const { trackInteraction, user } = useInteraction();
   const { addToBasket } = useBasket();
   const navigate = useNavigate();
@@ -41,7 +48,6 @@ export default function ProductDetailPage() {
       setRecoError("");
       try {
         const rec = await fetchRecommendation({ customerId: user.customerId });
-        console.log("recome", rec)
         setReco(rec);
       } catch (err) {
         setRecoError(err.message);
@@ -50,7 +56,27 @@ export default function ProductDetailPage() {
       }
     };
     runReco();
-  }, [user]);
+  }, [user, id]);
+
+  useEffect(() => {
+    const runCreative = async () => {
+      if (!reco || !reco.product_name) return;
+      setCreativeLoading(true);
+      setCreativeError("");
+      try {
+        const img = await fetchGeneratedImage({
+          productName: reco.product_name,
+          productCategory: reco.product_category || product?.category || ""
+        });
+        setCreativeSrc(img);
+      } catch (err) {
+        setCreativeError(err.message);
+      } finally {
+        setCreativeLoading(false);
+      }
+    };
+    runCreative();
+  }, [reco, product]);
 
   if (loading) return <p className="muted">Loading product...</p>;
   if (!product) return <p>Not found</p>;
@@ -104,6 +130,15 @@ export default function ProductDetailPage() {
                 <div className="muted">ID: {reco.recommended_product_id}</div>
                 <div className="muted">Rank: {reco.rank}</div>
                 <div className="muted">Score: {reco.final_score?.toFixed?.(3)}</div>
+                {creativeLoading && <p className="muted">Rendering creative...</p>}
+                {creativeError && <p className="muted">Creative error: {creativeError}</p>}
+                {creativeSrc && (
+                  <img
+                    src={creativeSrc}
+                    alt={reco.product_name}
+                    style={{ width: "100%", borderRadius: "10px", marginTop: "8px" }}
+                  />
+                )}
               </div>
             )}
           </div>
