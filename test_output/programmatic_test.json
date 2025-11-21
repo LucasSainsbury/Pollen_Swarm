@@ -1,0 +1,14 @@
+{
+  "input_image": "test_output/test_honey.jpg",
+  "output_image": "test_output/programmatic_test.png",
+  "layout": "vertical",
+  "product_name": "Test Product",
+  "tagline": "Test Tagline",
+  "nectar_points": 10,
+  "flavor_text": "Test flavor",
+  "dimensions": {
+    "width": 1080,
+    "height": 1920
+  },
+  "timestamp": "2025-11-21T12:33:27.068937+00:00"
+}

@@ -1,0 +1,14 @@
+{
+  "input_image": "test_output/test_honey.jpg",
+  "output_image": "test_output/honey_square.png",
+  "layout": "square",
+  "product_name": "Organic Honey",
+  "tagline": "Pure & Natural",
+  "nectar_points": 25,
+  "flavor_text": "Nature's golden treasure",
+  "dimensions": {
+    "width": 1080,
+    "height": 1080
+  },
+  "timestamp": "2025-11-21T12:32:38.038219+00:00"
+}

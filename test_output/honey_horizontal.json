@@ -1,0 +1,14 @@
+{
+  "input_image": "test_output/test_honey.jpg",
+  "output_image": "test_output/honey_horizontal.png",
+  "layout": "horizontal",
+  "product_name": "Organic Honey",
+  "tagline": "Pure Natural Sweetness",
+  "nectar_points": 25,
+  "flavor_text": "100% pure, never heated",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "timestamp": "2025-11-21T12:32:48.832083+00:00"
+}
