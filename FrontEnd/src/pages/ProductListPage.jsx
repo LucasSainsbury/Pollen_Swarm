@@ -4,7 +4,6 @@ import { fetchProducts } from "../services/api";
 import SearchBar from "../components/SearchBar";
 import ProductCard from "../components/ProductCard";
 import AdPanel from "../components/AdPanel";
-import InteractionFeed from "../components/InteractionFeed";
 import { useInteraction } from "../context/InteractionContext";
 import { useBasket } from "../context/BasketContext";
 
@@ -93,8 +92,8 @@ export default function ProductListPage() {
   console.log("pafedIrem", pagedItems)
 
   return (
-    <div className="grid">
-      <section className="stack">
+    <div className={user ? "grid" : ""}>
+      <section className="stack" style={!user ? { maxWidth: "1200px", margin: "0 auto" } : undefined}>
         <div className="card">
           <div className="card-head">
             <div>
@@ -146,10 +145,11 @@ export default function ProductListPage() {
           )}
         </div>
       </section>
-      <aside className="stack">
-        <AdPanel />
-        <InteractionFeed />
-      </aside>
+      {user && (
+        <aside className="stack">
+          <AdPanel />
+        </aside>
+      )}
     </div>
   );
 }
