@@ -53,6 +53,17 @@ from typing import Optional, Tuple
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+# Import clean helper functions from img_formatter
+from img_formatter import (
+    interpolate_color,
+    create_linear_gradient,
+    create_radial_gradient,
+    apply_vignette,
+    add_noise_overlay,
+    add_geometric_pattern,
+    draw_brand_widget
+)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -110,26 +121,14 @@ def create_gradient(
         vertical: bool = True,
         power: float = 1.0
 ) -> Image.Image:
-    """Create smooth gradient with non-linear progression."""
-    gradient = Image.new('RGB', (width, height))
-    draw = ImageDraw.Draw(gradient)
-
-    if vertical:
-        for y in range(height):
-            ratio = (y / height) ** power
-            r = int(color1[0] * (1 - ratio) + color2[0] * ratio)
-            g = int(color1[1] * (1 - ratio) + color2[1] * ratio)
-            b = int(color1[2] * (1 - ratio) + color2[2] * ratio)
-            draw.line([(0, y), (width, y)], fill=(r, g, b))
-    else:
-        for x in range(width):
-            ratio = (x / width) ** power
-            r = int(color1[0] * (1 - ratio) + color2[0] * ratio)
-            g = int(color1[1] * (1 - ratio) + color2[1] * ratio)
-            b = int(color1[2] * (1 - ratio) + color2[2] * ratio)
-            draw.line([(x, 0), (x, height)], fill=(r, g, b))
-
-    return gradient
+    """
+    Create smooth gradient with non-linear progression.
+    
+    This function now wraps the cleaner create_linear_gradient from img_formatter
+    for backward compatibility while using the improved implementation.
+    """
+    direction = 'vertical' if vertical else 'horizontal'
+    return create_linear_gradient((width, height), color1, color2, direction, power)
 
 
 def extract_dominant_color(image: Image.Image, sample_area: str = 'center') -> Tuple[int, int, int]:
@@ -188,24 +187,26 @@ def create_smart_overlay(
         brand_color: Tuple[int, int, int],
         alpha: int = 180
 ) -> Image.Image:
-    """Create a smart overlay that blends image colors with brand colors efficiently."""
+    """
+    Create a smart overlay that blends image colors with brand colors efficiently.
+    
+    Now uses the cleaner interpolate_color function for better code clarity.
+    """
     overlay = Image.new('RGBA', (width, height))
     
     # Use ImageDraw for more efficient rendering
     draw = ImageDraw.Draw(overlay)
     
-    # Create a gradient from extracted color to brand color
+    # Create a gradient from extracted color to brand color using cleaner helper
     for y in range(height):
         ratio = (y / height) ** 1.2
-        r = int(base_color[0] * (1 - ratio) + brand_color[0] * ratio)
-        g = int(base_color[1] * (1 - ratio) + brand_color[1] * ratio)
-        b = int(base_color[2] * (1 - ratio) + brand_color[2] * ratio)
+        color = interpolate_color(base_color, brand_color, ratio)
         
         # Vary alpha for smoother transitions
         line_alpha = int(alpha * (0.3 + 0.7 * ratio))
         
         # Draw entire line at once instead of pixel by pixel
-        draw.line([(0, y), (width, y)], fill=(r, g, b, line_alpha))
+        draw.line([(0, y), (width, y)], fill=color + (line_alpha,))
     
     return overlay
 
@@ -504,9 +505,27 @@ def format_vertical_premium(
         product_name: str = "Product",
         tagline: str = "Premium Quality",
         nectar_points: int = 10,
-        flavor_text: str = "Trusted quality"
+        flavor_text: str = "Trusted quality",
+        add_vignette: bool = False,
+        add_noise: bool = False,
+        add_pattern: bool = False
 ) -> Image.Image:
-    """Premium vertical banner with enhanced cohesive design and prominent branding."""
+    """
+    Premium vertical banner with enhanced cohesive design and prominent branding.
+    
+    Args:
+        image: Product image to format
+        product_name: Product name text
+        tagline: Tagline text
+        nectar_points: Reward points value
+        flavor_text: Descriptive flavor text
+        add_vignette: Apply soft edge darkening (optional)
+        add_noise: Add subtle texture overlay (optional)
+        add_pattern: Add geometric pattern overlay (optional)
+    
+    Returns:
+        Formatted image in vertical layout (1080x1920)
+    """
     width, height = LAYOUT_SIZES['vertical']
     output = Image.new('RGB', (width, height), color=BRAND_COLORS['white'])
 
@@ -608,27 +627,39 @@ def format_vertical_premium(
     badge_rgb = badge.convert('RGB')
     output.paste(badge_rgb, (badge_x, badge_y))
 
-    # Enhanced Pollen Swarm branding section - prominent placement
-    branding_bar_height = 85
-    branding_bar = create_enhanced_branding_bar(width, branding_bar_height)
-    branding_y = height - branding_bar_height - 85
-    output.paste(branding_bar, (0, branding_y), branding_bar)
-
-    # Flavor text above branding
+    # Flavor text below badge
     font_flavor = get_default_font(26, bold=False)
     bbox_flavor = draw.textbbox((0, 0), flavor_text, font=font_flavor)
     flavor_width = bbox_flavor[2] - bbox_flavor[0]
     flavor_x = (width - flavor_width) // 2
-    flavor_y = branding_y - 60
+    flavor_y = badge_y + badge_height + 40
     
     # Flavor text with shadow
     draw.text((flavor_x + 1, flavor_y + 1), flavor_text, font=font_flavor, fill=(0, 0, 0, 120))
     draw.text((flavor_x, flavor_y), flavor_text, font=font_flavor, fill=BRAND_COLORS['white'])
 
+    # Clean brand widget in bottom-right corner (replaces branding bar)
+    output = draw_brand_widget(
+        output,
+        text="Pollen Swarm",
+        size_ratio=0.25,
+        bg_color=BRAND_COLORS['purple'],
+        accent_color=BRAND_COLORS['orange']
+    )
+
     # Additional small logo in top right for brand consistency
     small_logo_size = 80
     small_logo = create_pollen_swarm_branding(small_logo_size, small_logo_size, style='logo')
     output.paste(small_logo, (width - small_logo_size - 25, 25), small_logo)
+
+    # Apply optional effects
+    if add_vignette:
+        output = apply_vignette(output, intensity=0.5, radius=0.7)
+    if add_noise:
+        output = add_noise_overlay(output, intensity=10, grain_size=1)
+    if add_pattern:
+        output = add_geometric_pattern(output, pattern_type='lines', 
+                                      color=BRAND_COLORS['white'], opacity=15, spacing=60)
 
     return output
 
@@ -638,9 +669,27 @@ def format_square_premium(
         product_name: str = "Product",
         tagline: str = "Premium Quality",
         nectar_points: int = 10,
-        flavor_text: str = "Trusted quality"
+        flavor_text: str = "Trusted quality",
+        add_vignette: bool = False,
+        add_noise: bool = False,
+        add_pattern: bool = False
 ) -> Image.Image:
-    """Premium square format with enhanced cohesive design and branding."""
+    """
+    Premium square format with enhanced cohesive design and branding.
+    
+    Args:
+        image: Product image to format
+        product_name: Product name text
+        tagline: Tagline text
+        nectar_points: Reward points value
+        flavor_text: Descriptive flavor text
+        add_vignette: Apply soft edge darkening (optional)
+        add_noise: Add subtle texture overlay (optional)
+        add_pattern: Add geometric pattern overlay (optional)
+    
+    Returns:
+        Formatted image in square layout (1080x1080)
+    """
     width, height = LAYOUT_SIZES['square']
     output = Image.new('RGB', (width, height), color=BRAND_COLORS['white'])
 
@@ -714,26 +763,38 @@ def format_square_premium(
                  font=font_product, fill=(0, 0, 0, 100))
     draw.text((product_x, product_y), product_name, font=font_product, fill=BRAND_COLORS['white'])
 
-    # Enhanced Pollen Swarm branding - center bottom with prominence
-    branding_bar_height = 75
-    branding_bar = create_enhanced_branding_bar(width, branding_bar_height)
-    branding_y = height - branding_bar_height - 30
-    output.paste(branding_bar, (0, branding_y), branding_bar)
-
-    # Badge positioned above branding
+    # Badge positioned in center
     badge_width = int(width * 0.75)
     badge_height = 150
     badge = create_premium_badge(badge_width, badge_height, nectar_points, "Earn rewards")
     badge_x = (width - badge_width) // 2
-    badge_y = branding_y - badge_height - 20
+    badge_y = product_y + 100
 
     badge_rgb = badge.convert('RGB')
     output.paste(badge_rgb, (badge_x, badge_y))
+
+    # Clean brand widget in bottom-right corner (replaces branding bar)
+    output = draw_brand_widget(
+        output,
+        text="Pollen Swarm",
+        size_ratio=0.25,
+        bg_color=BRAND_COLORS['purple'],
+        accent_color=BRAND_COLORS['orange']
+    )
 
     # Small logo in corner
     small_logo_size = 75
     small_logo = create_pollen_swarm_branding(small_logo_size, small_logo_size, style='logo')
     output.paste(small_logo, (width - small_logo_size - 20, 20), small_logo)
+
+    # Apply optional effects
+    if add_vignette:
+        output = apply_vignette(output, intensity=0.5, radius=0.7)
+    if add_noise:
+        output = add_noise_overlay(output, intensity=10, grain_size=1)
+    if add_pattern:
+        output = add_geometric_pattern(output, pattern_type='lines', 
+                                      color=BRAND_COLORS['white'], opacity=15, spacing=60)
 
     return output
 
@@ -744,9 +805,28 @@ def format_horizontal_premium(
         tagline: str = "Premium Quality",
         nectar_points: int = 10,
         flavor_text: str = "Trusted quality",
-        image_position: str = 'left'
+        image_position: str = 'left',
+        add_vignette: bool = False,
+        add_noise: bool = False,
+        add_pattern: bool = False
 ) -> Image.Image:
-    """Premium horizontal layout with enhanced cohesive composition and branding."""
+    """
+    Premium horizontal layout with enhanced cohesive composition and branding.
+    
+    Args:
+        image: Product image to format
+        product_name: Product name text
+        tagline: Tagline text
+        nectar_points: Reward points value
+        flavor_text: Descriptive flavor text
+        image_position: Image position ('left' or 'right')
+        add_vignette: Apply soft edge darkening (optional)
+        add_noise: Add subtle texture overlay (optional)
+        add_pattern: Add geometric pattern overlay (optional)
+    
+    Returns:
+        Formatted image in horizontal layout (1920x1080)
+    """
     width, height = LAYOUT_SIZES['horizontal']
     output = Image.new('RGB', (width, height), color=BRAND_COLORS['white'])
 
@@ -867,19 +947,21 @@ def format_horizontal_premium(
     badge_rgb = badge.convert('RGB')
     output.paste(badge_rgb, (badge_x, badge_y))
 
-    # Prominent Pollen Swarm branding section
-    branding_bar_height = 70
-    branding_bar_width = panel_width - 100
-    branding_bar = create_enhanced_branding_bar(branding_bar_width, branding_bar_height)
-    branding_x = panel_x + 20
-    branding_y = height - branding_bar_height - 45
-    output.paste(branding_bar, (branding_x, branding_y), branding_bar)
-
-    # Flavor text above branding
-    flavor_y = branding_y - 50
+    # Flavor text below badge
+    font_flavor = get_default_font(24, bold=False)
+    flavor_y = badge_y + badge_height + 40
     bbox_flavor = draw.textbbox((0, 0), flavor_text, font=font_flavor)
     draw.text((panel_x + 1, flavor_y + 1), flavor_text, font=font_flavor, fill=(0, 0, 0, 100))
     draw.text((panel_x, flavor_y), flavor_text, font=font_flavor, fill=BRAND_COLORS['orange_light'])
+
+    # Clean brand widget in bottom-right corner (replaces branding bar)
+    output = draw_brand_widget(
+        output,
+        text="Pollen Swarm",
+        size_ratio=0.22,  # Slightly smaller for horizontal layout
+        bg_color=BRAND_COLORS['purple'],
+        accent_color=BRAND_COLORS['orange']
+    )
 
     # Small logo on image side
     small_logo_size = 85
@@ -888,6 +970,15 @@ def format_horizontal_premium(
         output.paste(small_logo, (25, height - small_logo_size - 25), small_logo)
     else:
         output.paste(small_logo, (width - small_logo_size - 25, 25), small_logo)
+
+    # Apply optional effects
+    if add_vignette:
+        output = apply_vignette(output, intensity=0.5, radius=0.7)
+    if add_noise:
+        output = add_noise_overlay(output, intensity=10, grain_size=1)
+    if add_pattern:
+        output = add_geometric_pattern(output, pattern_type='lines', 
+                                      color=BRAND_COLORS['white'], opacity=15, spacing=60)
 
     return output
 
@@ -900,9 +991,30 @@ def format_creative(
         nectar_points: int = 15,
         flavor_text: str = "Join thousands of satisfied customers",
         output_path: Optional[str] = None,
-        image_position: str = 'left'
+        image_position: str = 'left',
+        add_vignette: bool = False,
+        add_noise: bool = False,
+        add_pattern: bool = False
 ) -> Tuple[str, str]:
-    """Format image into premium marketing layout."""
+    """
+    Format image into premium marketing layout with optional visual effects.
+    
+    Args:
+        input_image_path: Path to input image
+        layout: Layout format ('vertical', 'square', or 'horizontal')
+        product_name: Product name text
+        tagline: Tagline text
+        nectar_points: Reward points value
+        flavor_text: Descriptive flavor text
+        output_path: Optional output path (auto-generated if None)
+        image_position: Image position for horizontal layout ('left' or 'right')
+        add_vignette: Apply soft edge darkening (optional)
+        add_noise: Add subtle texture overlay (optional)
+        add_pattern: Add geometric pattern overlay (optional)
+        
+    Returns:
+        Tuple of (output_path, metadata_json)
+    """
     input_path = Path(input_image_path)
     if not input_path.exists():
         raise FileNotFoundError(f"Input image not found: {input_image_path}")
@@ -921,11 +1033,20 @@ def format_creative(
 
     # Format based on layout
     if layout == 'vertical':
-        formatted = format_vertical_premium(image, product_name, tagline, nectar_points, flavor_text)
+        formatted = format_vertical_premium(
+            image, product_name, tagline, nectar_points, flavor_text,
+            add_vignette, add_noise, add_pattern
+        )
     elif layout == 'square':
-        formatted = format_square_premium(image, product_name, tagline, nectar_points, flavor_text)
+        formatted = format_square_premium(
+            image, product_name, tagline, nectar_points, flavor_text,
+            add_vignette, add_noise, add_pattern
+        )
     elif layout == 'horizontal':
-        formatted = format_horizontal_premium(image, product_name, tagline, nectar_points, flavor_text, image_position)
+        formatted = format_horizontal_premium(
+            image, product_name, tagline, nectar_points, flavor_text, image_position,
+            add_vignette, add_noise, add_pattern
+        )
 
     # Determine output path
     if output_path is None:
@@ -986,6 +1107,11 @@ Examples:
     parser.add_argument("--flavor", type=str, default="Join thousands of satisfied customers")
     parser.add_argument("--output", "-o", type=str, default=None)
     parser.add_argument("--position", "-p", type=str, default="left", choices=['left', 'right'])
+    
+    # Optional visual effects
+    parser.add_argument("--vignette", action="store_true", help="Apply soft edge darkening")
+    parser.add_argument("--noise", action="store_true", help="Add subtle texture overlay")
+    parser.add_argument("--pattern", action="store_true", help="Add geometric pattern overlay")
 
     args = parser.parse_args()
 
@@ -1001,7 +1127,10 @@ Examples:
                 nectar_points=args.nectar_points,
                 flavor_text=args.flavor,
                 output_path=args.output,
-                image_position=args.position
+                image_position=args.position,
+                add_vignette=args.vignette,
+                add_noise=args.noise,
+                add_pattern=args.pattern
             )
             logger.info(f"\n✅ Complete!\nOutput: {output_path}\nMetadata: {metadata_path}")
             return 0
